@@ -2,12 +2,12 @@
 
 ## Base Instructions
 
-1. Install **[python 3.6.1](python.org/downloads/)**.
+1. Install **[python 3.6.1](https://www.python.org/downloads/)**.
 2. Install **virtualenvwrapper** via ```pip install virtualenvwrapper-win```.
 3. Create new environment using ```mkvirtualenv env```.
 4. If **env** is not automatically activated, then use ```workon env```.
 5. Install all requirements with ```pip install -r requirements.txt```
-6. Install **[VirtualBox 5.1](virtualbox.org)**  and turn on Vagrant machine with ```vagrant up```
+6. Install **[VirtualBox 5.1](https://www.virtualbox.org/wiki/Downloads)**  and turn on Vagrant machine with ```vagrant up```
 
 ## PyCharm setup
 
