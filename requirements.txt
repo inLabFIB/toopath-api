@@ -1,3 +1,8 @@
+appdirs==1.4.3
 Django==1.11
 djangorestframework==3.5.4
 djangorestframework-gis==0.11
+packaging==16.8
+psycopg2==2.7.1
+pyparsing==2.2.0
+six==1.10.0
