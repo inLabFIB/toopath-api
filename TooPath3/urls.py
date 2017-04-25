@@ -14,8 +14,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-from django.contrib import admin
+from TooPathAPI.devices import views as devices_views
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
+    url(r'^devices/(?P<id>[0-9]+)/lastLocation/$', devices_views.last_location),
 ]
