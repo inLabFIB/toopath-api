@@ -1,9 +1,43 @@
 from django.db import models
-from django.contrib.gis.db import models
+from django.contrib.gis.db import models as gismodels
 
 
 class Device(models.Model):
-    id = models.CharField(primary_key=True, max_length=20)
+    did = models.AutoField(primary_key=True, db_index=True, editable=False)
+    name = models.CharField(max_length=100, null=False)
+    description = models.CharField(max_length=200, null=True)
+    trash = models.BinaryField(null=False, default=False)
+    created_at = models.DateTimeField(auto_now_add=True, auto_now=False, null=False)
+    updated_at = models.DateTimeField(auto_now=True, null=False)
+    location = gismodels.PointField(dim=2, srid=4326, spatial_index=True, null=True, default=None)
+    height = models.FloatField(null=True, default=None)
+    speed = models.FloatField(null=True, default=None)
+    heading = models.FloatField(null=True, default=None)
+    utc = models.DateTimeField(null=True, db_index=True, default=None)
+    ANDROID = 'ad'
+    IPHONE = 'io'
+    WINDOWS_PHONE = 'wp'
+    ENFORA = 'en'
+    TYPE_CHOICES = (
+        (ANDROID, 'Android'),
+        (IPHONE, 'iPhone'),
+        (WINDOWS_PHONE, 'Windows Phone'),
+        (ENFORA, 'Enfora'),
+    )
+    device_type = models.CharField(max_length=2, null=False, choices=TYPE_CHOICES, default=ANDROID)
+    device_imei = models.CharField(max_length=40, null=True)
+    PRIVATE = 'pr'
+    PUBLIC = 'pu'
+    ANONYMOUS = 'an'
+    FRIENDS = 'fr'
+    PRIVACY_CHOICES = (
+        (PRIVATE, 'Private'),
+        (PUBLIC, 'Public'),
+        (ANONYMOUS, 'Anonymous'),
+        (FRIENDS, 'Friends'),
+    )
+    device_privacy = models.CharField(max_length=2, null=False, choices=PRIVACY_CHOICES, default=PRIVATE)
+    device_ip = models.GenericIPAddressField(null=True, blank=True)
 
     class Meta:
         db_table = 'device'
@@ -13,8 +47,12 @@ class Device(models.Model):
 
 
 class Location(models.Model):
-    point = models.PointField()
-    device = models.ForeignKey(Device, on_delete=models.CASCADE)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    location = gismodels.PointField()
+    did = models.ForeignKey(Device, on_delete=models.CASCADE, related_name='device_did')
+    created_at = models.DateTimeField(auto_now_add=True, auto_now=False, null=False)
+    updated_at = models.DateTimeField(auto_now=True, null=False)
 
     class Meta:
         db_table = 'location'
