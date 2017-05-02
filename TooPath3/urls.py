@@ -18,4 +18,5 @@ from TooPathAPI.devices import views as devices_views
 
 urlpatterns = [
     url(r'^devices/(?P<id>[0-9]+)/lastLocation/$', devices_views.last_location),
+    url(r'^devices/(?P<id>[0-9]+)/location/$', devices_views.post_location),
 ]
