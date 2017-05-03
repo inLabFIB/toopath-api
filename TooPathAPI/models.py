@@ -45,6 +45,14 @@ class Device(models.Model):
     def __init__(self, *args, **kwargs):
         super(Device, self).__init__(*args, **kwargs)
 
+    @property
+    def extract_latitude_point(self):
+        return self.location.x
+
+    @property
+    def extract_longitude_point(self):
+        return self.location.y
+
 
 class Location(models.Model):
     latitude = models.FloatField()
