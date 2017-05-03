@@ -4,13 +4,14 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED
 
-from TooPathAPI.devices.serializer import LocationSerializer
+from TooPathAPI.devices.serializer import LocationSerializer, DeviceLocationSerializer
 from TooPathAPI.models import Device
 
 
 @api_view(['GET'])
 def last_location(request, id):
     device = get_object_or_404(Device, pk=id)
+    data = DeviceLocationSerializer(data=device)
     return Response({'latitude': device.location.x, 'longitude': device.location.y})
 
 
