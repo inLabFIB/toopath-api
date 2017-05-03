@@ -17,6 +17,5 @@ from django.conf.urls import url
 from TooPathAPI.devices import views as devices_views
 
 urlpatterns = [
-    url(r'^devices/(?P<id>[0-9]+)/location/$', devices_views.get_device_location),
-    url(r'^devices/(?P<id>[0-9]+)/location/$', devices_views.post_location),
+    url(r'^devices/(?P<id>[0-9]+)/location/$', devices_views.device_location),
 ]
