@@ -8,21 +8,20 @@ from TooPathAPI.devices.serializer import LocationSerializer, DeviceLocationSeri
 from TooPathAPI.models import Device
 
 
-@api_view(['GET'])
-def last_location(request, id):
-    device = get_object_or_404(Device, pk=id)
-    response = DeviceLocationSerializer(device)
-    return Response(response.data)
+@api_view(['GET', 'POST'])
+def device_location(request, id):
+    if request.method == 'GET':
+        device = get_object_or_404(Device, pk=id)
+        response = DeviceLocationSerializer(device)
+        return Response(response.data)
 
-
-@api_view(['POST'])
-def post_location(request, id):
-    device = get_object_or_404(Device, pk=id)
-    data = JSONParser().parse(request)
-    data['did'] = int(id)
-    serializer = LocationSerializer(data=data)
-    if (serializer.is_valid()):
-        device.location.x = serializer.validated_data['latitude']
-        device.location.y = serializer.validated_data['longitude']
-        device.save()
-    return Response(status=HTTP_201_CREATED)
+    elif request.method == 'POST':
+        device = get_object_or_404(Device, pk=id)
+        data = JSONParser().parse(request)
+        data['did'] = int(id)
+        serializer = LocationSerializer(data=data)
+        if (serializer.is_valid()):
+            device.location.x = serializer.validated_data['latitude']
+            device.location.y = serializer.validated_data['longitude']
+            device.save()
+        return Response(status=HTTP_201_CREATED)
