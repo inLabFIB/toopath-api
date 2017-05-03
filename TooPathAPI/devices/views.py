@@ -9,7 +9,7 @@ from TooPathAPI.models import Device
 
 
 @api_view(['GET'])
-def last_location(request, id):
+def get_device_location(request, id):
     device = get_object_or_404(Device, pk=id)
     response = DeviceLocationSerializer(device)
     return Response(response.data)
