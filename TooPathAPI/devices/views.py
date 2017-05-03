@@ -11,8 +11,8 @@ from TooPathAPI.models import Device
 @api_view(['GET'])
 def last_location(request, id):
     device = get_object_or_404(Device, pk=id)
-    data = DeviceLocationSerializer(data=device)
-    return Response({'latitude': device.location.x, 'longitude': device.location.y})
+    response = DeviceLocationSerializer(device)
+    return Response(response.data)
 
 
 @api_view(['POST'])
