@@ -12,8 +12,7 @@ class DeviceLocationSerializer(serializers.Serializer):
 
 
 class LocationSerializer(serializers.ModelSerializer):
-    device_id = serializers.RelatedField(source='did', read_only='True')
 
     class Meta:
         model = Location
-        fields = ('latitude', 'longitude', 'device_id')
+        fields = ('latitude', 'longitude', 'did')
