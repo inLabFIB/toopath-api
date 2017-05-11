@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
                 ('location', django.contrib.gis.db.models.fields.PointField(srid=4326)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('did', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='device_did', to='TooPathAPI.Device')),
+                ('did', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='device_did', to='TooPath3.api.Device')),
             ],
             options={
                 'db_table': 'location',
