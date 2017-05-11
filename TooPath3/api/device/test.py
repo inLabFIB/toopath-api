@@ -16,5 +16,4 @@ class DeviceTests(APITestCase):
         factory = APIRequestFactory()
         request = factory.get('/devices/1/location')
         response = device_location(request, id=1)
-        response.render()
-        self.assertEqual(response.content, '{"latitude":40.1234,"longitude":2.1234}')
+        self.assertEqual(response.data, {'latitude':40.1234,'longitude':2.1234})
