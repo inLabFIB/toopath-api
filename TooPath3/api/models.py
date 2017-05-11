@@ -6,7 +6,6 @@ class Device(models.Model):
     did = models.AutoField(primary_key=True, db_index=True, editable=False)
     name = models.CharField(max_length=100, null=False)
     description = models.CharField(max_length=200, null=True)
-    trash = models.BinaryField(null=False, default=False)
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False, null=False)
     updated_at = models.DateTimeField(auto_now=True, null=False)
     location = gismodels.PointField(dim=2, srid=4326, spatial_index=True, null=True, default=None)

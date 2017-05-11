@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from TooPathAPI.models import Location, Device
+from TooPath3.api.models import Location, Device
 
 
 class DeviceLocationSerializer(serializers.Serializer):

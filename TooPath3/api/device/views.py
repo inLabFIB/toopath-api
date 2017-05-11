@@ -1,11 +1,11 @@
-from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
+from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED
 
-from TooPathAPI.devices.serializer import LocationSerializer, DeviceLocationSerializer
-from TooPathAPI.models import Device
+from TooPath3.api.device.serializer import DeviceLocationSerializer, LocationSerializer
+from TooPath3.api.models import Device
 
 
 @api_view(['GET', 'POST'])

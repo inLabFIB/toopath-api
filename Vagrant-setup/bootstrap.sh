@@ -85,7 +85,7 @@ service postgresql restart
 cat << EOF | su - postgres -c psql
 -- Create the database user:
 CREATE USER $APP_DB_USER WITH PASSWORD '$APP_DB_PASS';
-ALTER USER $APP_DB_USER CREATEDB;
+ALTER USER $APP_DB_USER WITH SUPERUSER;
 
 -- Create the database:
 CREATE DATABASE $APP_DB_NAME WITH OWNER=$APP_DB_USER
