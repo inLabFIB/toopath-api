@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('TooPathAPI', '0001_initial'),
+        ('api', '0001_initial'),
     ]
 
     operations = [
