@@ -1,8 +1,8 @@
-from TooPathAPI.models import Device
 from django.contrib.gis.geos import Point
 from rest_framework.test import APITestCase, APIRequestFactory
 
-from TooPath3.api.device import device_location
+from TooPath3.api.device.views import device_location
+from TooPath3.api.models import Device
 
 
 class DeviceTests(APITestCase):
