@@ -25,3 +25,10 @@ With Django, migrations become easier, it will generate migrations from the data
 Use ```python manage.py makemigrations``` to create migrations
 
 Use ```python manage.py migrate``` to apply migrations
+
+### Get it up
+Use ```python manage.py runserver x.x.x.x:aaaa``` where x.x.x.x is the address and aaaa is the port
+
+On local use ```python manage.py runserver 8080 --settings=CarGuard.settings.local```
+
+On DEMO-VM use ```python manage.py runserver 0.0.0.0:8000 --settings=TooPath3.settings.production```
