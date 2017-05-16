@@ -1,9 +1,8 @@
-from django.core.serializers import serialize
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
-from rest_framework.status import HTTP_201_CREATED
+from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
 from TooPath3.api.device.serializer import DeviceLocationSerializer, LocationSerializer
 from TooPath3.api.models import Device
@@ -34,4 +33,6 @@ def device_location(request, id):
             device.location.y = serializer.validated_data['longitude']
             device.save()
             serializer.save()
-        return Response(serializer.data, HTTP_201_CREATED)
+            return Response(serializer.data, HTTP_201_CREATED)
+        else:
+            return Response(HTTP_400_BAD_REQUEST)
