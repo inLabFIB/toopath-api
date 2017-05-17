@@ -16,10 +16,6 @@ DATA_GET_AND_POST = {
     'latitude': 40.1234,
     'longitude': 2.1234
 }
-DATA_GET_AND_POST_BAD_FORMAT = {
-    'latitude': '40.1234',
-    'longitude': 2.1234
-}
 DEVICE_ID = 1
 NON_EXISTENT_DEVICE_ID = 666
 
