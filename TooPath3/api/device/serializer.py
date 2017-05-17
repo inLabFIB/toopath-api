@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
 from TooPath3.api.models import Location, Device
 
@@ -11,8 +12,8 @@ class DeviceLocationSerializer(serializers.Serializer):
         model = Device
 
 
-class LocationSerializer(serializers.ModelSerializer):
-
+class LocationSerializer(GeoFeatureModelSerializer):
     class Meta:
         model = Location
-        fields = ('latitude', 'longitude', 'did')
+        geo_field = "location"
+        fields = ('did', 'latitude', 'longitude')
