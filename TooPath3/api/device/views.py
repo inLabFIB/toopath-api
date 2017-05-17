@@ -34,5 +34,3 @@ def device_location(request, id):
             device.save()
             serializer.save()
             return Response(serializer.data, HTTP_201_CREATED)
-        else:
-            return Response(HTTP_400_BAD_REQUEST)
