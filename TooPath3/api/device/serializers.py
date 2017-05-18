@@ -17,3 +17,9 @@ class LocationSerializer(GeoFeatureModelSerializer):
         model = Location
         geo_field = "location"
         fields = ('did', 'latitude', 'longitude')
+
+
+class LocationDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Location
+        fields = ('latitude', 'longitude')
