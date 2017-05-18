@@ -4,7 +4,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_200_OK
 
-from TooPath3.api.device.serializer import DeviceLocationSerializer, LocationSerializer
+from TooPath3.api.device.serializers import DeviceLocationSerializer, LocationSerializer
 from TooPath3.api.models import Device
 
 
