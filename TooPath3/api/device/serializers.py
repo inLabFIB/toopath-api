@@ -12,6 +12,12 @@ class DeviceLocationSerializer(serializers.Serializer):
         model = Device
 
 
+class DeviceIpAddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Device
+        fields = ('ip_address')
+
+
 class LocationSerializer(GeoFeatureModelSerializer):
     class Meta:
         model = Location

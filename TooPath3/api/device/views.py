@@ -44,7 +44,7 @@ def device_location(request, id):
 def device_ip_address(request, id):
     device = get_object_or_404(Device, pk=id)
     data = JSONParser().parse(request)
-    serializer = IpAddressSerializer(data=data)
+    serializer = DeviceIpAddressSerializer(data=data)
     if (serializer.is_valid()):
         return Response(serializer.data, HTTP_200_OK)
     else:
