@@ -16,27 +16,33 @@ IP_ADDRESS_URI = '/ipAddress'
 
 # DATA constants
 DATA_LOCATION = {
-    "latitude": 40.1234,
-    "longitude": 2.1234
+    'latitude': 40.1234,
+    'longitude': 2.1234
 }
 INVALID_DATA_LOCATION = {
+    'lat': 40.1234,
+    'lon': 2.1234
+}
+DATA_IP_ADDRESS = {
+    'ip': '127.0.0.1'
 }
 INVALID_DATA_IP_ADDRESS = {
-    "AA": 1
+    'ip': '1'
 }
 GEO_JSON_RESPONSE_DATA_POST_LOCATION = {
-    "type": "Feature",
-    "geometry": {
-        "type": "Point",
-        "coordinates": [40.1234, 2.1234]
+    'type': 'Feature',
+    'geometry': {
+        'type': 'Point',
+        'coordinates': [40.1234, 2.1234]
     },
-    "properties": {
-        "did": 1,
-        "latitude": 40.1234,
-        "longitude": 2.1234
+    'properties': {
+        'did': 1,
+        'latitude': 40.1234,
+        'longitude': 2.1234
     }
 }
 DEVICE_ID = 1
+LOCATION_ID = 1
 NON_EXISTENT_DEVICE_ID = 666
 
 
@@ -77,6 +83,10 @@ class DeviceTests(APITestCase):
         response = device_location(request, id=DEVICE_ID)
         self.assertEqual(response.data, DATA_LOCATION)
 
+    """
+    POST /devices/:id/location
+    """
+
     def test_given_existing_device__when_post_device_location_with_existing_device_id__then_return_created(self):
         """
         Ensure we get a CREATED on post device location with existing id
@@ -86,11 +96,8 @@ class DeviceTests(APITestCase):
         response = device_location(request, id=DEVICE_ID)
         self.assertEqual(response.status_code, HTTP_201_CREATED)
 
-    """
-    POST /devices/:id/location
-    """
-
-    def test_given_existing_device__when_post_device_location_with_invalid_data__then_return_bad_request(self):
+    def test_given_existing_device__when_post_device_location_with_existent_id_and_invalid_data__then_return_bad_request(
+            self):
         """
         Ensure we get a CREATED on post device location with existing id
         """
@@ -99,7 +106,8 @@ class DeviceTests(APITestCase):
         response = device_location(request, id=DEVICE_ID)
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
 
-    def test_given_existing_device__when_post_device_location__with_non_existent_device_id__then_return_not_found(self):
+    def test_given_existing_device__when_post_device_location__with_non_existent_device_id_and_valid_data__then_return_not_found(
+            self):
         """
         Ensure we get a NOT FOUND when pass a non existent device id on request
         """
@@ -108,23 +116,58 @@ class DeviceTests(APITestCase):
         response = device_location(request, id=NON_EXISTENT_DEVICE_ID)
         self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
 
-    def test_given_existing_device__when_post_device_location__with_existent_device_id__then_new_location_exist(
+    def test_given_existing_device__when_post_device_location__with_existent_device_id_and_valid_data__then_new_location_exist(
             self):
         """
         Ensure we insert the new location into the database
         """
         factory = APIRequestFactory()
-        request = factory.post(DEVICE_URI + DEVICE_ID_URI + LOCATION_URI, INVALID_DATA_LOCATION, format='json')
+        request = factory.post(DEVICE_URI + DEVICE_ID_URI + LOCATION_URI, DATA_LOCATION, format='json')
         device_location(request, id=DEVICE_ID)
-        location = Location.objects.filter(id=1)
+        location = Location.objects.get(id=LOCATION_ID)
         self.assertIsNotNone(self, location)
 
     """
     PUT devices/:id/ipAddress
     """
 
-    def test_given_existing_device__when_put_device_ip_address__with_invalid_data__then_return_bad_request(self):
+    def test_given_existing_device__when_put_device_ip_address__with_existent_id_and_invalid_data__then_return_bad_request(
+            self):
+        """
+        Ensure we get a BAD REQUEST when pass a existent device id and invalid data on request
+        """
         factory = APIRequestFactory()
         request = factory.put(DEVICE_URI + DEVICE_ID_URI + IP_ADDRESS_URI, INVALID_DATA_IP_ADDRESS, format='json')
         response = device_ip_address(request, id=DEVICE_ID)
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
+
+    def test_given_existing_device__when_put_device_ip_address__with_non_existing_device_id_and_valid_data__then_return_not_found(
+            self):
+        """
+        Ensure we get a NOT FOUND when pass a non existent device id and valid data on request
+        """
+        factory = APIRequestFactory()
+        request = factory.put(DEVICE_URI + NON_EXISTENT_DEVICE_ID_URI + IP_ADDRESS_URI, DATA_IP_ADDRESS, format='json')
+        response = device_ip_address(request, id=NON_EXISTENT_DEVICE_ID)
+        self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
+
+    def test_given_existing_device__when_put_device_ip_address__with_existing_device_id_and_valid_data__then_return_ok(
+            self):
+        """
+        Ensure we get a OK when pass a existent device id and valid data on request
+        """
+        factory = APIRequestFactory()
+        request = factory.put(DEVICE_URI + NON_EXISTENT_DEVICE_ID_URI + IP_ADDRESS_URI, DATA_IP_ADDRESS, format='json')
+        response = device_ip_address(request, id=DEVICE_ID)
+        self.assertEqual(response.status_code, HTTP_200_OK)
+
+    def test_given_existing_device__when_put_device_ip_address__with_existing_device_id_and_valid_data__then_ip_address_field_is_updated(
+            self):
+        """
+        Ensure the ip_address field is updated when pass a existent device id and valid data on request
+        """
+        factory = APIRequestFactory()
+        request = factory.put(DEVICE_URI + DEVICE_ID_URI + IP_ADDRESS_URI, DATA_IP_ADDRESS, format='json')
+        device_ip_address(request, id=DEVICE_ID)
+        device = Device.objects.get(did=DEVICE_ID)
+        self.assertEqual(device.ip_address, '127.0.0.1')
