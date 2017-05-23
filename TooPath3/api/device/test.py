@@ -4,7 +4,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND, HTTP_201_CREATED, HTTP_200_OK
 from rest_framework.test import APITestCase, APIRequestFactory
 
-from TooPath3.api.device.views import device_location
+from TooPath3.api.device.views import device_location, device_ip_address
 from TooPath3.api.models import Device, Location
 
 # URI constants
@@ -16,15 +16,13 @@ IP_ADDRESS_URI = '/ipAddress'
 
 # DATA constants
 DATA_LOCATION = {
-    'latitude': 40.1234,
-    'longitude': 2.1234
+    "latitude": 40.1234,
+    "longitude": 2.1234
 }
 INVALID_DATA_LOCATION = {
-    'lat': 40.1234,
-    'long': 2.1234
 }
 INVALID_DATA_IP_ADDRESS = {
-    'ip_address': 1
+    "AA": 1
 }
 GEO_JSON_RESPONSE_DATA_POST_LOCATION = {
     "type": "Feature",
@@ -44,7 +42,8 @@ NON_EXISTENT_DEVICE_ID = 666
 
 class DeviceTests(APITestCase):
     def setUp(self):
-        Device.objects.create(did=1, name='car', location=Point(40.1234, 2.1234), device_type='ad', device_privacy='pr')
+        Device.objects.create(did=1, name='car', location=Point(40.1234, 2.1234), ip_address='0.0.0.0',
+                              device_type='ad', device_privacy='pr')
 
     """
     GET devices/:id/location
