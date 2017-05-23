@@ -8,6 +8,7 @@ class Device(models.Model):
     description = models.CharField(max_length=200, null=True)
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False, null=False)
     updated_at = models.DateTimeField(auto_now=True, null=False)
+    ip_address = models.GenericIPAddressField(null=True)
     location = gismodels.PointField(dim=2, srid=4326, spatial_index=True, null=True, default=None)
     height = models.FloatField(null=True, default=None)
     speed = models.FloatField(null=True, default=None)

@@ -40,7 +40,7 @@ def device_location(request, id):
             return Response(status=HTTP_400_BAD_REQUEST)
 
 
-@api_view('PUT')
+@api_view(['PUT'])
 def device_ip_address(request, id):
     device = get_object_or_404(Device, pk=id)
     data = JSONParser().parse(request)
