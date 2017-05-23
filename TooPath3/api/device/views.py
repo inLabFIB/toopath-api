@@ -37,8 +37,7 @@ def device_location(request, id):
                 device.save()
                 serializer.save()
                 return Response(serializer.validated_data, HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PUT'])
@@ -49,5 +48,4 @@ def device_ip_address(request, id):
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.validated_data, HTTP_200_OK)
-    else:
-        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
