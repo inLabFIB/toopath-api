@@ -107,6 +107,10 @@ class DeviceTests(APITestCase):
         self.assertIsNotNone(self, location)
 
     """
+    GET devices/:id/ipAddress
+    """
+
+    """
     PUT devices/:id/ipAddress
     """
 
