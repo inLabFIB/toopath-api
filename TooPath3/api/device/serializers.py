@@ -22,7 +22,7 @@ class DeviceIpAddressSerializer(serializers.ModelSerializer):
 class LocationSerializer(GeoFeatureModelSerializer):
     class Meta:
         model = Location
-        geo_field = "location"
+        geo_field = 'location'
         fields = ('did', 'latitude', 'longitude')
 
 

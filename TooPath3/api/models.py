@@ -8,7 +8,7 @@ class Device(models.Model):
     description = models.CharField(max_length=200, null=True)
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False, null=False)
     updated_at = models.DateTimeField(auto_now=True, null=False)
-    ip_address = models.GenericIPAddressField(null=True)
+    ip_address = models.GenericIPAddressField(null=False)
     location = gismodels.PointField(dim=2, srid=4326, spatial_index=True, null=True, default=None)
     height = models.FloatField(null=True, default=None)
     speed = models.FloatField(null=True, default=None)
@@ -55,9 +55,9 @@ class Device(models.Model):
 
 
 class Location(models.Model):
-    latitude = models.FloatField()
-    longitude = models.FloatField()
-    location = gismodels.PointField()
+    latitude = models.FloatField(null=False)
+    longitude = models.FloatField(null=False)
+    location = gismodels.PointField(null=False)
     did = models.ForeignKey(Device, on_delete=models.CASCADE, related_name='device_did')
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False, null=False)
     updated_at = models.DateTimeField(auto_now=True, null=False)
