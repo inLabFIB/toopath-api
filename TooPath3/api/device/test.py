@@ -110,6 +110,20 @@ class DeviceTests(APITestCase):
     GET devices/:id/ipAddress
     """
 
+    def test_given_existing_device__when_get_device_ip_address__with_non_existing_device_id_and_valid_data__then_return_not_found(
+            self):
+        factory = APIRequestFactory()
+        request = factory.get(DEVICE_URI + NON_EXISTENT_DEVICE_ID_URI + IP_ADDRESS_URI, DATA_IP_ADDRESS, format='json')
+        response = device_ip_address(request, id=NON_EXISTENT_DEVICE_ID)
+        self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
+
+    def test_given_existing_device__when_get_device_ip_address__with_existing_device_id_and_valid_data__then_return_ok(
+            self):
+        factory = APIRequestFactory()
+        request = factory.get(DEVICE_URI + NON_EXISTENT_DEVICE_ID_URI + IP_ADDRESS_URI, DATA_IP_ADDRESS, format='json')
+        response = device_ip_address(request, id=DEVICE_ID)
+        self.assertEqual(response.status_code, HTTP_200_OK)
+
     """
     PUT devices/:id/ipAddress
     """
