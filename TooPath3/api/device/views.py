@@ -40,12 +40,18 @@ def device_location(request, id):
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
-@api_view(['PUT'])
+@api_view(['GET', 'PUT'])
 def device_ip_address(request, id):
     device = get_object_or_404(Device, pk=id)
-    data = JSONParser().parse(request)
-    serializer = DeviceIpAddressSerializer(device, data=data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.validated_data, HTTP_200_OK)
-    return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+    if request.method == 'GET':
+        serializer = DeviceIpAddressSerializer(device)
+        return Response(serializer.data, HTTP_200_OK)
+
+    elif request.method == 'PUT':
+        data = JSONParser().parse(request)
+        serializer = DeviceIpAddressSerializer(device, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.validated_data, HTTP_200_OK)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
