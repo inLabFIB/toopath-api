@@ -24,7 +24,7 @@ class LocationSerializer(GeoFeatureModelSerializer):
     class Meta:
         model = Location
         geo_field = 'location'
-        fields = ('did',)
+        fields = ('device',)
 
     def validate(self, data):
         if (data['location'].x < -90.0) or (data['location'].x > 90.0):
