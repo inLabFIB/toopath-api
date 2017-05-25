@@ -27,9 +27,9 @@ class LocationSerializer(GeoFeatureModelSerializer):
         fields = ('device',)
 
     def validate(self, data):
-        if (data['location'].x < -90.0) or (data['location'].x > 90.0):
+        if (data['location'].y < -90.0) or (data['location'].y > 90.0):
             raise serializers.ValidationError(DEFAULT_ERROR_MESSAGES['invalid_latitude'])
-        elif (data['location'].y < -180) or (data['location'].y > 180):
+        elif (data['location'].x < -180) or (data['location'].x > 180):
             raise serializers.ValidationError(DEFAULT_ERROR_MESSAGES['invalid_longitude'])
         return data
 

@@ -37,7 +37,6 @@ class Device(models.Model):
         (FRIENDS, 'Friends'),
     )
     device_privacy = models.CharField(max_length=2, null=False, choices=PRIVACY_CHOICES, default=PRIVATE)
-    device_ip = models.GenericIPAddressField(null=True, blank=True)
 
     class Meta:
         db_table = 'device'

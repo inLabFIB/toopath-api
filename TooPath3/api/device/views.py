@@ -25,7 +25,7 @@ def device_location(request, id):
                 'device': id,
                 'location': {
                     'type': 'Point',
-                    'coordinates': [serializer.validated_data['latitude'], serializer.validated_data['longitude']],
+                    'coordinates': [serializer.validated_data['longitude'], serializer.validated_data['latitude']],
                 }
             }
             serializer = LocationSerializer(data=geo_json)
