@@ -38,8 +38,3 @@ class LocationDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = ('latitude', 'longitude')
-
-    def validate(self, data):
-        if ('latitude' not in data) or ('longitude' not in data):
-            raise serializers.ValidationError(DEFAULT_ERROR_MESSAGES['invalid_format'])
-        return data
