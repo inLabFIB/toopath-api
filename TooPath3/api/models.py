@@ -67,3 +67,8 @@ class Location(models.Model):
 
     def __init__(self, *args, **kwargs):
         super(Location, self).__init__(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        self.latitude = self.location.y
+        self.longitude = self.location.x
+        super(Location, self).save(*args, **kwargs)

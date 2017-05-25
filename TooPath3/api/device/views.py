@@ -23,8 +23,6 @@ def device_location(request, id):
         if serializer.is_valid():
             geo_json = {
                 "did": id,
-                "latitude": serializer.validated_data['latitude'],
-                "longitude": serializer.validated_data['longitude'],
                 "location": {
                     "type": "Point",
                     "coordinates": [serializer.validated_data['latitude'], serializer.validated_data['longitude']],
@@ -32,9 +30,6 @@ def device_location(request, id):
             }
             serializer = LocationSerializer(data=geo_json)
             if serializer.is_valid():
-                device.location.x = serializer.validated_data['latitude']
-                device.location.y = serializer.validated_data['longitude']
-                device.save()
                 serializer.save()
                 return Response(serializer.validated_data, HTTP_201_CREATED)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
