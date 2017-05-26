@@ -37,7 +37,6 @@ class Device(models.Model):
         (FRIENDS, 'Friends'),
     )
     device_privacy = models.CharField(max_length=2, null=False, choices=PRIVACY_CHOICES, default=PRIVATE)
-    device_ip = models.GenericIPAddressField(null=True, blank=True)
 
     class Meta:
         db_table = 'device'
@@ -58,7 +57,7 @@ class Location(models.Model):
     latitude = models.FloatField(null=False)
     longitude = models.FloatField(null=False)
     location = gismodels.PointField(null=False)
-    did = models.ForeignKey(Device, on_delete=models.CASCADE, related_name='device_did')
+    device = models.ForeignKey(Device, on_delete=models.CASCADE, related_name='locations')
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False, null=False)
     updated_at = models.DateTimeField(auto_now=True, null=False)
 
@@ -67,3 +66,9 @@ class Location(models.Model):
 
     def __init__(self, *args, **kwargs):
         super(Location, self).__init__(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        self.latitude = self.location.y
+        self.longitude = self.location.x
+        self.device.location = self.location
+        super(Location, self).save(*args, **kwargs)
