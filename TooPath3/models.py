@@ -39,7 +39,7 @@ class Device(models.Model):
     device_privacy = models.CharField(max_length=2, null=False, choices=PRIVACY_CHOICES, default=PRIVATE)
 
     class Meta:
-        db_table = 'device'
+        db_table = 'devices'
 
     def __init__(self, *args, **kwargs):
         super(Device, self).__init__(*args, **kwargs)
@@ -71,4 +71,5 @@ class Location(models.Model):
         self.latitude = self.location.y
         self.longitude = self.location.x
         self.device.location = self.location
+        self.device.save()
         super(Location, self).save(*args, **kwargs)

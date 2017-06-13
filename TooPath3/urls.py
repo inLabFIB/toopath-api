@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 
-from TooPath3.api.device import views as devices_views
+from TooPath3.devices import views as devices_views
 
 urlpatterns = [
     url(r'^devices/(?P<id>[0-9]+)/location$', devices_views.device_location),
