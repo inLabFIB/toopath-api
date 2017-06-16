@@ -1,4 +1,4 @@
-# TooPath V3 API
+# TooPath v3
 
 ## Base Instructions
 
@@ -22,13 +22,15 @@
 ### Migrations
 With Django, migrations become easier, it will generate migrations from the data models. Migrations will be saved with an automatic number identifier in *migrations* folder inside of the corresponding app.
 
-Use ```python manage.py makemigrations``` to create migrations
+Use ```python manage.py makemigrations --settings=TooPath3.settings.local``` to create migrations
 
-Use ```python manage.py migrate``` to apply migrations
+Use ```python manage.py migrate --settings=TooPath3.settings.local``` to apply migrations
 
 ### Get it up
 Use ```python manage.py runserver x.x.x.x:aaaa``` where x.x.x.x is the address and aaaa is the port
 
-On local use ```python manage.py runserver 8080 --settings=CarGuard.settings.local```
+On local use ```python manage.py runserver 127.0.0.1:8080 --settings=TooPath3.settings.local```
 
-On DEMO-VM use ```python manage.py runserver 0.0.0.0:8000 --settings=TooPath3.settings.production```
+On DEMO-VM use ```python manage.py runserver 127.0.0.1:8080 --settings=TooPath3.settings.production```
+
+In case of migrates aren't applied you can follow the steps of the Migrations section using ```--settings=TooPath3.settings.production```

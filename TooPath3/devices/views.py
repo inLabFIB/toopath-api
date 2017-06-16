@@ -4,9 +4,9 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_200_OK
 
-from TooPath3.api.device.serializers import DeviceLocationSerializer, LocationSerializer, LocationDataSerializer, \
+from TooPath3.devices.serializers import DeviceLocationSerializer, LocationSerializer, LocationDataSerializer, \
     DeviceIpAddressSerializer
-from TooPath3.api.models import Device
+from TooPath3.models import Device
 
 
 @api_view(['GET', 'POST'])
@@ -25,7 +25,7 @@ def device_location(request, id):
                 'device': id,
                 'location': {
                     'type': 'Point',
-                    'coordinates': [serializer.validated_data['longitude'], serializer.validated_data['latitude']],
+                    'coordinates': [serializer.validated_data['latitude'], serializer.validated_data['longitude']],
                 }
             }
             serializer = LocationSerializer(data=geo_json)

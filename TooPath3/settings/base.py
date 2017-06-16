@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'rest_framework',
     'rest_framework_gis',
-    'TooPath3.api.apps.ToopathapiConfig',
+    'TooPath3.apps.TooPathConfig',
 ]
 
 MIDDLEWARE = [

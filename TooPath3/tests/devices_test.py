@@ -2,8 +2,8 @@ from django.contrib.gis.geos import Point
 from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND, HTTP_201_CREATED, HTTP_200_OK
 from rest_framework.test import APITestCase, APIRequestFactory
 
-from TooPath3.api.device.views import device_location, device_ip_address
-from TooPath3.api.models import Device, Location
+from TooPath3.devices.views import device_location, device_ip_address
+from TooPath3.models import Device, Location
 
 # URI constants
 DEVICE_URI = '/devices/'

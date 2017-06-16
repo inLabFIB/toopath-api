@@ -1,8 +1,8 @@
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
-from TooPath3.api.device.constants import DEFAULT_ERROR_MESSAGES
-from TooPath3.api.models import Location, Device
+from TooPath3.devices.constants import DEFAULT_ERROR_MESSAGES
+from TooPath3.models import Location, Device
 
 
 class DeviceLocationSerializer(serializers.ModelSerializer):
