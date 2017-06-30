@@ -28,7 +28,7 @@ class Device(models.Model):
     description = models.CharField(max_length=200, null=True)
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False, null=False)
     updated_at = models.DateTimeField(auto_now=True, null=False)
-    trash = models.BinaryField(null=False, default=False)
+    trash = models.BooleanField(null=False, default=False)
     ip_address = models.GenericIPAddressField(null=False)
     height = models.FloatField(null=True, default=None)
     speed = models.FloatField(null=True, default=None)
@@ -58,6 +58,11 @@ class ActualLocation(Location):
 
     class Meta(Location.Meta):
         db_table = 'actual_location'
+
+    def save(self, *args, **kwargs):
+        self.latitude = self.location.y
+        self.longitude = self.location.x
+        super(Location, self).save(*args, **kwargs)
 
 
 class RouteLocation(Location):
