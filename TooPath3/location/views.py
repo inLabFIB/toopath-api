@@ -9,7 +9,7 @@ from TooPath3.models import Device
 
 
 @api_view(['POST'])
-def device_location(request, id):
+def device_actual_location(request, id):
     device = get_object_or_404(Device, pk=id)
     data = JSONParser().parse(request)
     serializer = CoordinatesSerializer(data=data)
