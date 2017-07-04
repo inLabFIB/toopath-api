@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_gis import serializers as gis_serializers
 
-from TooPath3.devices.constants import DEFAULT_ERROR_MESSAGES
+from TooPath3.constants import DEFAULT_ERROR_MESSAGES
 from TooPath3.models import ActualLocation
 
 

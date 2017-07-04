@@ -5,7 +5,7 @@ from TooPath3.models import Device
 
 
 class DeviceSerializer(serializers.ModelSerializer):
-    actual_location = ActualLocationSerializer()
+    actual_location = ActualLocationSerializer(read_only=True)
 
     class Meta:
         model = Device
