@@ -3,7 +3,7 @@ from django.contrib.gis.db import models as gismodels
 
 
 class Location(models.Model):
-    location = gismodels.PointField(null=False)
+    point = gismodels.PointField(null=False)
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False, null=False)
     updated_at = models.DateTimeField(auto_now=True, null=False)
 
@@ -56,7 +56,7 @@ class Device(models.Model):
     device_privacy = models.CharField(max_length=2, null=False, choices=PRIVACY_CHOICES, default=PRIVATE)
     device_type = models.CharField(max_length=2, null=False, choices=TYPE_CHOICES, default=ANDROID)
     device_imei = models.CharField(max_length=40, null=True)
-    location = models.OneToOneField(ActualLocation, on_delete=models.CASCADE)
+    actual_location = models.OneToOneField(ActualLocation, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'devices'

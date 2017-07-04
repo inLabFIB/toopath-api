@@ -13,12 +13,12 @@ class CoordinatesSerializer(serializers.Serializer):
 class ActualLocationSerializer(gis_serializers.GeoFeatureModelSerializer):
     class Meta:
         model = ActualLocation
-        geo_field = 'location'
+        geo_field = 'point'
         fields = '__all__'
 
     def validate(self, data):
-        if (data['location'].y < -90.0) or (data['location'].y > 90.0):
+        if (data['point'].y < -90.0) or (data['point'].y > 90.0):
             raise serializers.ValidationError(DEFAULT_ERROR_MESSAGES['invalid_latitude'])
-        elif (data['location'].x < -180) or (data['location'].x > 180):
+        elif (data['point'].x < -180) or (data['point'].x > 180):
             raise serializers.ValidationError(DEFAULT_ERROR_MESSAGES['invalid_longitude'])
         return data

@@ -8,20 +8,27 @@ from TooPath3.location.serializers import CoordinatesSerializer, ActualLocationS
 from TooPath3.models import Device
 
 
-@api_view(['PUT'])
+@api_view(['GET', 'PUT'])
 def device_actual_location(request, id):
-    data = JSONParser().parse(request)
-    serializer = CoordinatesSerializer(data=data)
-    if serializer.is_valid():
-        device = get_object_or_404(Device, pk=id)
-        geo_json = {
-            'location': {
-                'type': 'Point',
-                'coordinates': [serializer.validated_data['latitude'], serializer.validated_data['longitude']]
-            }
-        }
-        serializer = ActualLocationSerializer(device.location, data=geo_json)
+    device = get_object_or_404(Device, pk=id)
+
+    if request.method == 'GET':
+        serializer = ActualLocationSerializer(device.actual_location)
+        if serializer.is_valid:
+            return Response(serializer.data, status=HTTP_200_OK)
+
+    elif request.method == 'PUT':
+        data = JSONParser().parse(request)
+        serializer = CoordinatesSerializer(data=data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.validated_data, HTTP_200_OK)
-    return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+            geo_json = {
+                'point': {
+                    'type': 'Point',
+                    'coordinates': [serializer.validated_data['latitude'], serializer.validated_data['longitude']]
+                }
+            }
+            serializer = ActualLocationSerializer(device.actual_location, data=geo_json)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.validated_data, HTTP_200_OK)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
