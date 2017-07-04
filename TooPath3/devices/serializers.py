@@ -1,40 +1,12 @@
 from rest_framework import serializers
-from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
-from TooPath3.devices.constants import DEFAULT_ERROR_MESSAGES
-from TooPath3.models import Location, Device
+from TooPath3.locations.serializers import ActualLocationSerializer
+from TooPath3.models import Device
 
 
-class DeviceLocationSerializer(serializers.ModelSerializer):
-    latitude = serializers.FloatField(source='extract_latitude_point', read_only='True')
-    longitude = serializers.FloatField(source='extract_longitude_point', read_only='True')
+class DeviceSerializer(serializers.ModelSerializer):
+    actual_location = ActualLocationSerializer(read_only=True)
 
     class Meta:
         model = Device
-        fields = ('latitude', 'longitude')
-
-
-class DeviceIpAddressSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Device
-        fields = ('ip_address',)
-
-
-class LocationSerializer(GeoFeatureModelSerializer):
-    class Meta:
-        model = Location
-        geo_field = 'location'
-        fields = ('device',)
-
-    def validate(self, data):
-        if (data['location'].y < -90.0) or (data['location'].y > 90.0):
-            raise serializers.ValidationError(DEFAULT_ERROR_MESSAGES['invalid_latitude'])
-        elif (data['location'].x < -180) or (data['location'].x > 180):
-            raise serializers.ValidationError(DEFAULT_ERROR_MESSAGES['invalid_longitude'])
-        return data
-
-
-class LocationDataSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Location
-        fields = ('latitude', 'longitude')
+        fields = '__all__'
