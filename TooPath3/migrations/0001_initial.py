@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
             name='ActualLocation',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('location', django.contrib.gis.db.models.fields.PointField(srid=4326)),
+                ('locations', django.contrib.gis.db.models.fields.PointField(srid=4326)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
             ],
@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
                 ('device_privacy', models.CharField(choices=[('pr', 'Private'), ('pu', 'Public'), ('an', 'Anonymous'), ('fr', 'Friends')], default='pr', max_length=2)),
                 ('device_type', models.CharField(choices=[('ad', 'Android'), ('io', 'iPhone'), ('wp', 'Windows Phone'), ('en', 'Enfora')], default='ad', max_length=2)),
                 ('device_imei', models.CharField(max_length=40, null=True)),
-                ('location', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='TooPath3.ActualLocation')),
+                ('locations', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='TooPath3.ActualLocation')),
             ],
             options={
                 'db_table': 'devices',
@@ -55,7 +55,7 @@ class Migration(migrations.Migration):
             name='RouteLocation',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('location', django.contrib.gis.db.models.fields.PointField(srid=4326)),
+                ('locations', django.contrib.gis.db.models.fields.PointField(srid=4326)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
             ],

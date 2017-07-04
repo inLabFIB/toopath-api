@@ -4,7 +4,7 @@ from django.contrib.gis.geos import Point
 from rest_framework.test import APITestCase, APIRequestFactory
 from rest_framework_gis.fields import GeoJsonDict
 
-from TooPath3.location.views import *
+from TooPath3.locations.views import *
 from TooPath3.models import Device
 
 # DATA constants

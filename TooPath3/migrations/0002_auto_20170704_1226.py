@@ -14,17 +14,17 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RenameField(
             model_name='actuallocation',
-            old_name='location',
+            old_name='locations',
             new_name='point',
         ),
         migrations.RenameField(
             model_name='device',
-            old_name='location',
+            old_name='locations',
             new_name='actual_location',
         ),
         migrations.RenameField(
             model_name='routelocation',
-            old_name='location',
+            old_name='locations',
             new_name='point',
         ),
     ]

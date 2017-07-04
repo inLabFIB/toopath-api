@@ -4,7 +4,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.status import *
 
-from TooPath3.location.serializers import CoordinatesSerializer, ActualLocationSerializer
+from TooPath3.locations.serializers import CoordinatesSerializer, ActualLocationSerializer
 from TooPath3.models import ActualLocation
 
 
