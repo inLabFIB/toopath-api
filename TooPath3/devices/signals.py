@@ -7,5 +7,5 @@ from TooPath3.models import Device, ActualLocation
 
 @receiver(pre_save, sender=Device)
 def create_device(sender, instance, **kwargs):
-    ActualLocation.objects.create(pk=instance.did, location=Point(0,0))
+    ActualLocation.objects.create(pk=instance.did, location=Point())
     instance.location_id = instance.did
