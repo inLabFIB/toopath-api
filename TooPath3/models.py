@@ -2,6 +2,25 @@ from django.db import models
 from django.contrib.gis.db import models as gismodels
 
 
+class Location(models.Model):
+    location = gismodels.PointField(null=False)
+    created_at = models.DateTimeField(auto_now_add=True, auto_now=False, null=False)
+    updated_at = models.DateTimeField(auto_now=True, null=False)
+
+    class Meta:
+        abstract = True
+
+
+class ActualLocation(Location):
+    class Meta(Location.Meta):
+        db_table = 'actual_locations'
+
+
+class RouteLocation(Location):
+    class Meta(Location.Meta):
+        db_table = 'route_locations'
+
+
 class Device(models.Model):
     PRIVATE = 'pr'
     PUBLIC = 'pu'
@@ -37,34 +56,7 @@ class Device(models.Model):
     device_privacy = models.CharField(max_length=2, null=False, choices=PRIVACY_CHOICES, default=PRIVATE)
     device_type = models.CharField(max_length=2, null=False, choices=TYPE_CHOICES, default=ANDROID)
     device_imei = models.CharField(max_length=40, null=True)
+    location = models.OneToOneField(ActualLocation, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'devices'
-
-
-class Location(models.Model):
-    latitude = models.FloatField(null=False)
-    longitude = models.FloatField(null=False)
-    location = gismodels.PointField(null=False)
-    created_at = models.DateTimeField(auto_now_add=True, auto_now=False, null=False)
-    updated_at = models.DateTimeField(auto_now=True, null=False)
-
-    class Meta:
-        abstract = True
-
-
-class ActualLocation(Location):
-    device = models.ForeignKey(Device, on_delete=models.CASCADE, related_name='actual_location')
-
-    class Meta(Location.Meta):
-        db_table = 'actual_location'
-
-    def save(self, *args, **kwargs):
-        self.latitude = self.location.y
-        self.longitude = self.location.x
-        super(Location, self).save(*args, **kwargs)
-
-
-class RouteLocation(Location):
-    class Meta(Location.Meta):
-        db_table = 'route_location'

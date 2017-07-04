@@ -8,21 +8,20 @@ from TooPath3.location.serializers import CoordinatesSerializer, ActualLocationS
 from TooPath3.models import Device
 
 
-@api_view(['POST'])
+@api_view(['PUT'])
 def device_actual_location(request, id):
-    device = get_object_or_404(Device, pk=id)
     data = JSONParser().parse(request)
     serializer = CoordinatesSerializer(data=data)
     if serializer.is_valid():
+        device = get_object_or_404(Device, pk=id)
         geo_json = {
-            'device': device.did,
             'location': {
                 'type': 'Point',
                 'coordinates': [serializer.validated_data['latitude'], serializer.validated_data['longitude']]
             }
         }
-        serializer = ActualLocationSerializer(data=geo_json)
+        serializer = ActualLocationSerializer(device.location, data=geo_json)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.validated_data, HTTP_201_CREATED)
+            return Response(serializer.validated_data, HTTP_200_OK)
     return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)

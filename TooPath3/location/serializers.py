@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework_gis import serializers as gis_serializers
 
 from TooPath3.devices.constants import DEFAULT_ERROR_MESSAGES
-from TooPath3.models import Location, ActualLocation
+from TooPath3.models import ActualLocation
 
 
 class CoordinatesSerializer(serializers.Serializer):
@@ -14,7 +14,7 @@ class ActualLocationSerializer(gis_serializers.GeoFeatureModelSerializer):
     class Meta:
         model = ActualLocation
         geo_field = 'location'
-        fields = ('device',)
+        fields = '__all__'
 
     def validate(self, data):
         if (data['location'].y < -90.0) or (data['location'].y > 90.0):
