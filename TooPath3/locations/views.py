@@ -1,3 +1,4 @@
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.generics import get_object_or_404
 from rest_framework.parsers import JSONParser
@@ -11,7 +12,7 @@ from TooPath3.models import ActualLocation
 
 
 @api_view(['GET', 'PUT'])
-@authentication_classes((JSONWebTokenAuthentication), )
+@authentication_classes((JSONWebTokenAuthentication, SessionAuthentication, BasicAuthentication), )
 @permission_classes((IsAuthenticated,))
 def device_actual_location(request, id):
     if request.method == 'GET':
