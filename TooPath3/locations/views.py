@@ -1,14 +1,18 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.generics import get_object_or_404
 from rest_framework.parsers import JSONParser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import *
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from TooPath3.locations.serializers import CoordinatesSerializer, ActualLocationSerializer
 from TooPath3.models import ActualLocation
 
 
 @api_view(['GET', 'PUT'])
+@authentication_classes((JSONWebTokenAuthentication), )
+@permission_classes((IsAuthenticated,))
 def device_actual_location(request, id):
     if request.method == 'GET':
         actual_location = get_object_or_404(ActualLocation, pk=id)

@@ -1,14 +1,18 @@
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.parsers import JSONParser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import *
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from TooPath3.devices.serializers import DeviceSerializer
 from TooPath3.models import Device
 
 
 @api_view(['GET', 'PUT'])
+@authentication_classes((JSONWebTokenAuthentication),)
+@permission_classes((IsAuthenticated,))
 def device_detail(request, id):
     device = get_object_or_404(Device, pk=id)
 

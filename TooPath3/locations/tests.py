@@ -1,8 +1,9 @@
 from collections import OrderedDict
 
+from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import Point
+from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase, APIRequestFactory
-from rest_framework_gis.fields import GeoJsonDict
 
 from TooPath3.locations.views import *
 from TooPath3.models import Device
@@ -28,6 +29,8 @@ INVALID_LONGITUDE_DATA_LOCATION = {
 
 class ActualLocationTests(APITestCase):
     def setUp(self):
+        UserModel = get_user_model()
+        UserModel.objects.create(username='test', password='password')
         device = Device.objects.create(did=1, name='car', ip_address='0.0.0.0', device_type='ad', device_privacy='pr')
         device.actual_location.point = Point(30, 1)
         device.actual_location.save()
