@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import make_password
 from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
@@ -10,6 +11,8 @@ from TooPath3.users.serializers import UserSerializer
 @api_view(['POST'])
 def new_user(request):
     data = JSONParser().parse(request)
+    if 'password' in data:
+        data['password'] = make_password(data['password'])
     serializer = UserSerializer(data=data)
     if serializer.is_valid():
         user = serializer.save()
