@@ -8,7 +8,7 @@ urlpatterns = [
     url(r'^devices/(?P<id>[0-9]+)', devices_views.device_detail),
     url(r'^devices/(?P<id>[0-9]+)/currentLocation$', locations_views.device_actual_location),
     url(r'^users', users_views.new_user),
-    url(r'^api-token-auth/', obtain_jwt_token),
-    url(r'^api-token-refresh/', refresh_jwt_token),
-    url(r'^api-token-verify/', verify_jwt_token),
+    url(r'^api-token-auth', obtain_jwt_token),
+    url(r'^api-token-refresh', refresh_jwt_token),
+    url(r'^api-token-verify', verify_jwt_token),
 ]

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_gis',
     'TooPath3.apps.TooPathConfig',
+    'rest_framework_jwt',
 ]
 
 MIDDLEWARE = [

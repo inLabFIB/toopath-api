@@ -47,6 +47,12 @@ class ActualLocationTests(APITestCase):
         response = device_actual_location(request, id=1)
         self.assertEqual(response.status_code, HTTP_200_OK)
 
+    def test_given_existing_device__when_get_device_actual_location_with_no_authentication__then_return_unauthorized(
+            self):
+        request = self.factory.get('/devices/1/actualLocation', format='json')
+        response = device_actual_location(request, id=1)
+        self.assertEqual(response.status_code, HTTP_401_UNAUTHORIZED)
+
     def test_given_existing_device__when_get_device_actual_location_with_non_existing_device_id__then_return_not_found(
             self):
         request = self.factory.get('/devices/1/actualLocation', format='json')
@@ -78,6 +84,12 @@ class ActualLocationTests(APITestCase):
         force_authenticate(request, user=self.user, token=self.token)
         response = device_actual_location(request, id=1)
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
+
+    def test_given_existing_device__when_put_device_actual_location_with_no_authentication__then_return_unauthorized(
+            self):
+        request = self.factory.put('/devices/1/actualLocation', VALID_DATA_LOCATION, format='json')
+        response = device_actual_location(request, id=1)
+        self.assertEqual(response.status_code, HTTP_401_UNAUTHORIZED)
 
     def test_given_existing_device__when_put_device_actual_location_with_invalid_device_id__then_return_not_found(self):
         request = self.factory.put('/devices/1/actualLocation', VALID_DATA_LOCATION, format='json')
