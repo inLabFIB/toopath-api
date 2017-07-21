@@ -58,7 +58,7 @@ class Device(models.Model):
     device_type = models.CharField(max_length=2, null=False, choices=TYPE_CHOICES, default=ANDROID)
     device_imei = models.CharField(max_length=40, null=True)
     actual_location = models.OneToOneField(ActualLocation, on_delete=models.CASCADE)
-    owner = models.ForeignKey(UserModel, related_name='devices', on_delete=models.CASCADE, default='unknown')
+    owner = models.ForeignKey(UserModel, related_name='devices', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'devices'

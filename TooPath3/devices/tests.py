@@ -23,7 +23,8 @@ class DevicesTest(APITestCase):
         jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
         payload = jwt_payload_handler(self.user)
         self.token = jwt_encode_handler(payload)
-        Device.objects.create(did=1, name='car', ip_address='0.0.0.0', device_type='ad', device_privacy='pr')
+        Device.objects.create(did=1, name='car', ip_address='0.0.0.0', device_type='ad', device_privacy='pr',
+                              owner=self.user)
 
     """ 
     GET /devices/:id
