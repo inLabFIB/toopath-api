@@ -49,6 +49,7 @@ class Device(models.Model):
     updated_at = models.DateTimeField(auto_now=True, null=False)
     trash = models.BooleanField(null=False, default=False)
     ip_address = models.GenericIPAddressField(null=False)
+    port_number = models.IntegerField(null=False)
     height = models.FloatField(null=True, default=None)
     speed = models.FloatField(null=True, default=None)
     heading = models.FloatField(null=True, default=None)

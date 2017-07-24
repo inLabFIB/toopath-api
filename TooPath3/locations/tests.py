@@ -28,7 +28,7 @@ INVALID_LONGITUDE_DATA_LOCATION = {
 
 class ActualLocationTests(APITestCase):
     def setUp(self):
-        device = Device.objects.create(did=1, name='car', ip_address='0.0.0.0', device_type='ad', device_privacy='pr')
+        device = Device.objects.create(did=1, name='car', ip_address='0.0.0.0', port_number=8080, device_type='ad', device_privacy='pr')
         device.actual_location.point = Point(30, 1)
         device.actual_location.save()
 

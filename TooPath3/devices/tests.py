@@ -6,7 +6,8 @@ from TooPath3.models import Device
 
 # DATA CONSTANTS
 VALID_DATA_DEVICE = {
-    "ip_address": "127.0.0.1"
+    "ip_address": "127.0.0.1",
+    "port_number": 8000
 }
 INVALID_DATA_DEVICE = {
     "ip": "127.0.0.1"
@@ -15,7 +16,7 @@ INVALID_DATA_DEVICE = {
 
 class DevicesTest(APITestCase):
     def setUp(self):
-        Device.objects.create(did=1, name='car', ip_address='0.0.0.0', device_type='ad', device_privacy='pr')
+        Device.objects.create(did=1, name='car', ip_address='0.0.0.0', port_number=8080, device_type='ad', device_privacy='pr')
 
     """ 
     GET /devices/:id
