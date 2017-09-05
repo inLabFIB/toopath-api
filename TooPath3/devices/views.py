@@ -21,12 +21,12 @@ class DeviceDetail(APIView):
         self.check_object_permissions(self.request, obj=obj)
         return obj
 
-    def get(self, request, pk, format=None):
+    def get(self, request, pk):
         device = self.get_object(pk)
         serializer = DeviceSerializer(device)
         return Response(serializer.data, status=HTTP_200_OK)
 
-    def put(self, request, pk, format=None):
+    def put(self, request, pk):
         device = self.get_object(pk)
         data = JSONParser().parse(request)
         if 'name' not in data:

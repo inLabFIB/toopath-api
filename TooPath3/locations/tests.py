@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import make_password
 from django.contrib.gis.geos import Point
 from rest_framework.test import APITestCase, APIRequestFactory, force_authenticate
 from django.contrib.auth.models import User
@@ -28,11 +29,14 @@ INVALID_LONGITUDE_DATA_LOCATION = {
 class ActualLocationTests(APITestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
-        self.user = User.objects.create(username='test', password='password')
+        self.user = User.objects.create(username='test', password=make_password('password'))
+        self.user2 = User.objects.create(username='test2', password=make_password('password'))
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
         jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
         payload = jwt_payload_handler(self.user)
         self.token = jwt_encode_handler(payload)
+        payload = jwt_payload_handler(self.user2)
+        self.token2 = jwt_encode_handler(payload)
         device = Device.objects.create(did=1, name='car', ip_address='0.0.0.0', device_type='ad', device_privacy='pr',
                                        owner=self.user)
         device.actual_location.point = Point(30, 1)
@@ -91,6 +95,13 @@ class ActualLocationTests(APITestCase):
         request = self.factory.put('/devices/1/actualLocation', VALID_DATA_LOCATION, format='json')
         response = device_actual_location(request, id=1)
         self.assertEqual(response.status_code, HTTP_401_UNAUTHORIZED)
+
+    def test_given_existing_device__when_put_device_actual_location_with_user_logged_different_than_device_owner__then_return_no_permission(
+            self):
+        request = self.factory.put('/devices/1', VALID_DATA_LOCATION, format='json')
+        force_authenticate(request, user=self.user2, token=self.token2)
+        response = device_actual_location(request, id=1)
+        self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
 
     def test_given_existing_device__when_put_device_actual_location_with_invalid_device_id__then_return_not_found(self):
         request = self.factory.put('/devices/1/actualLocation', VALID_DATA_LOCATION, format='json')
