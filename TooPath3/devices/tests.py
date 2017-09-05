@@ -29,7 +29,7 @@ class DevicesTest(APITestCase):
         payload = jwt_payload_handler(self.user2)
         self.token2 = jwt_encode_handler(payload)
         Device.objects.create(did=1, name='car', ip_address='0.0.0.0', device_type='ad', device_privacy='pr',
-                              owner=self.user)
+                              port_number='8080', owner=self.user)
 
     """ 
     GET /devices/:id

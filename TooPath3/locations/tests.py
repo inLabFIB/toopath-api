@@ -38,7 +38,7 @@ class ActualLocationTests(APITestCase):
         payload = jwt_payload_handler(self.user2)
         self.token2 = jwt_encode_handler(payload)
         device = Device.objects.create(did=1, name='car', ip_address='0.0.0.0', device_type='ad', device_privacy='pr',
-                                       owner=self.user)
+                                       owner=self.user, port_number='8080')
         device.actual_location.point = Point(30, 1)
         device.actual_location.save()
 
