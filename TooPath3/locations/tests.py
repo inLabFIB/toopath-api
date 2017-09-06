@@ -49,27 +49,27 @@ class ActualLocationTests(APITestCase):
     def test_given_existing_device__when_get_device_actual_location_with_existing_device_id__then_return_ok(self):
         request = self.factory.get('/devices/1/actualLocation', format='json')
         force_authenticate(request, user=self.user, token=self.token)
-        response = device_actual_location(request, id=1)
+        response = DeviceActualLocation.as_view()(request, pk=1)
         self.assertEqual(response.status_code, HTTP_200_OK)
 
     def test_given_existing_device__when_get_device_actual_location_with_no_authentication__then_return_unauthorized(
             self):
         request = self.factory.get('/devices/1/actualLocation', format='json')
-        response = device_actual_location(request, id=1)
+        response = DeviceActualLocation.as_view()(request, pk=1)
         self.assertEqual(response.status_code, HTTP_401_UNAUTHORIZED)
 
     def test_given_existing_device__when_get_device_actual_location_with_non_existing_device_id__then_return_not_found(
             self):
         request = self.factory.get('/devices/1/actualLocation', format='json')
         force_authenticate(request, user=self.user, token=self.token)
-        response = device_actual_location(request, id=100)
+        response = DeviceActualLocation.as_view()(request, pk=100)
         self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
 
     def test_given_existing_device__when_get_device_actual_location_with_existing_device_id__then_return_actual_location(
             self):
         request = self.factory.get('/devices/1/actualLocation', format='json')
         force_authenticate(request, user=self.user, token=self.token)
-        response = device_actual_location(request, id=1)
+        response = DeviceActualLocation.as_view()(request, pk=1)
         response.render()
         expected_response_content = b'{"id":1,"type":"Feature","geometry":{"type":"Point","coordinates":[30.0,1.0]}'
         self.assertIn(expected_response_content, response.content)
@@ -81,39 +81,39 @@ class ActualLocationTests(APITestCase):
     def test_given_existing_device__when_put_device_actual_location_with_existing_device_id__then_return_ok(self):
         request = self.factory.put('/devices/1/actualLocation', VALID_DATA_LOCATION, format='json')
         force_authenticate(request, user=self.user, token=self.token)
-        response = device_actual_location(request, id=1)
+        response = DeviceActualLocation.as_view()(request, pk=1)
         self.assertEqual(response.status_code, HTTP_200_OK)
 
     def test_given_existing_device__when_put_device_actual_location_with_invalid_data__then_return_bad_request(self):
         request = self.factory.put('/devices/1/actualLocation', INVALID_DATA_LOCATION, format='json')
         force_authenticate(request, user=self.user, token=self.token)
-        response = device_actual_location(request, id=1)
+        response = DeviceActualLocation.as_view()(request, pk=1)
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
 
     def test_given_existing_device__when_put_device_actual_location_with_no_authentication__then_return_unauthorized(
             self):
         request = self.factory.put('/devices/1/actualLocation', VALID_DATA_LOCATION, format='json')
-        response = device_actual_location(request, id=1)
+        response = DeviceActualLocation.as_view()(request, id=1)
         self.assertEqual(response.status_code, HTTP_401_UNAUTHORIZED)
 
     def test_given_existing_device__when_put_device_actual_location_with_user_logged_different_than_device_owner__then_return_no_permission(
             self):
         request = self.factory.put('/devices/1', VALID_DATA_LOCATION, format='json')
         force_authenticate(request, user=self.user2, token=self.token2)
-        response = device_actual_location(request, id=1)
+        response = DeviceActualLocation.as_view()(request, pk=1)
         self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
 
     def test_given_existing_device__when_put_device_actual_location_with_invalid_device_id__then_return_not_found(self):
         request = self.factory.put('/devices/1/actualLocation', VALID_DATA_LOCATION, format='json')
         force_authenticate(request, user=self.user, token=self.token)
-        response = device_actual_location(request, id=100)
+        response = DeviceActualLocation.as_view()(request, pk=100)
         self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
 
-    def test_given_existing_device__when_put_device_actual_location_with_valid_device_id_and_valid_data__then_update_latitude(
+    def test_given_existing_device__when_put_device_actual_location_with_valpk_device_id_and_valid_data__then_update_latitude(
             self):
         request = self.factory.put('/devices/1/actualLocation', VALID_DATA_LOCATION, format='json')
         force_authenticate(request, user=self.user, token=self.token)
-        device_actual_location(request, id=1)
+        DeviceActualLocation.as_view()(request, pk=1)
         actual_location = ActualLocation.objects.get(pk=1)
         self.assertEqual(actual_location.point.x, 40.0)
 
@@ -121,7 +121,7 @@ class ActualLocationTests(APITestCase):
             self):
         request = self.factory.put('/devices/1/actualLocation', VALID_DATA_LOCATION, format='json')
         force_authenticate(request, user=self.user, token=self.token)
-        device_actual_location(request, id=1)
+        DeviceActualLocation.as_view()(request, pk=1)
         actual_location = ActualLocation.objects.get(pk=1)
         self.assertEqual(actual_location.point.y, 2.0)
 
@@ -129,12 +129,12 @@ class ActualLocationTests(APITestCase):
             self):
         request = self.factory.put('/devices/1/actualLocation', INVALID_LATITUDE_DATA_LOCATION, format='json')
         force_authenticate(request, user=self.user, token=self.token)
-        response = device_actual_location(request, id=1)
+        response = DeviceActualLocation.as_view()(request, pk=1)
         self.assertEqual(response.data, {'non_field_errors': ['Enter a valid latitude.']})
 
     def test_given_existing_device__when_put_device_actual_location_with_invalid_latitude__then_return_longitude_validation_error(
             self):
         request = self.factory.put('/devices/1/actualLocation', INVALID_LONGITUDE_DATA_LOCATION, format='json')
         force_authenticate(request, user=self.user, token=self.token)
-        response = device_actual_location(request, id=1)
+        response = DeviceActualLocation.as_view()(request, pk=1)
         self.assertEqual(response.data, {'non_field_errors': ['Enter a valid longitude.']})
