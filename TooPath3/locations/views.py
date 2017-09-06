@@ -7,22 +7,28 @@ from rest_framework.status import *
 from rest_framework.views import APIView
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
+from TooPath3.devices.permissions import IsOwnerOrReadOnly
 from TooPath3.locations.serializers import CoordinatesSerializer, ActualLocationSerializer
 from TooPath3.models import ActualLocation
 
 
 class DeviceActualLocation(APIView):
     authentication_classes = (JSONWebTokenAuthentication, SessionAuthentication, BasicAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsOwnerOrReadOnly,)
+
+    def get_object(self, pk):
+        obj = get_object_or_404(ActualLocation, pk=pk)
+        self.check_object_permissions(self.request, obj=obj)
+        return obj
 
     def get(self, request, pk):
-        actual_location = get_object_or_404(ActualLocation, pk=pk)
+        actual_location = self.get_object(pk)
         serializer = ActualLocationSerializer(actual_location)
         if serializer.is_valid:
             return Response(serializer.data, status=HTTP_200_OK)
 
     def put(self, request, pk):
-        actual_location = get_object_or_404(ActualLocation, pk=pk)
+        actual_location = self.get_object(pk)
         data = JSONParser().parse(request)
         serializer = CoordinatesSerializer(data=data)
         if serializer.is_valid():
