@@ -4,7 +4,7 @@
 export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
 export WORKON_HOME=~/.virtualenvs
 source /usr/local/bin/virtualenvwrapper.sh
-workon tootpath
+workon toopath
 
 # Install requirements
 pip install -r requirements.txt
