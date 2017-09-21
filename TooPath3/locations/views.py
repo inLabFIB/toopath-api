@@ -30,5 +30,5 @@ def device_actual_location(request, id):
             serializer = ActualLocationSerializer(actual_location, data=geo_json)
             if serializer.is_valid():
                 serializer.save()
-                return Response(HTTP_200_OK)
+                return Response(HTTP_201_CREATED)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
