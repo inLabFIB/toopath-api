@@ -13,4 +13,4 @@ pip install -r requirements.txt
 python manage.py migrate --settings=TooPath3.settings.production
 
 # Start TooPath API
-python manage.py runserver 0.0.0.0:8000 --settings=TooPath3.settings.production >> toopath.log 2>&1 &
+python manage.py runserver 0.0.0.0:8080 --settings=TooPath3.settings.production >> toopath.log 2>&1 &
