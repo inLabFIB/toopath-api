@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Configure Virtual Environment Wrapper
 export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
