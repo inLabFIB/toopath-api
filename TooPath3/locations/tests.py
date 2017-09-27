@@ -82,7 +82,7 @@ class ActualLocationTests(APITestCase):
         request = self.factory.put('/devices/1/actualLocation', VALID_DATA_LOCATION, format='json')
         force_authenticate(request, user=self.user, token=self.token)
         response = DeviceActualLocation.as_view()(request, pk=1)
-        self.assertEqual(response.status_code, HTTP_200_OK)
+        self.assertEqual(response.status_code, HTTP_201_CREATED)
 
     def test_given_existing_device__when_put_device_actual_location_with_invalid_data__then_return_bad_request(self):
         request = self.factory.put('/devices/1/actualLocation', INVALID_DATA_LOCATION, format='json')
