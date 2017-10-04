@@ -1,6 +1,18 @@
+import uuid
+
 from django.db import models
 from django.contrib.gis.db import models as gismodels
-from django.contrib.auth.models import User as UserModel
+from django.contrib.auth.models import User as UserModel, AbstractUser, User
+
+
+class CustomUser(User):
+    jwt_secret = models.UUIDField(
+        'Token secret',
+        help_text='Changing this will log out user everywhere',
+        default=uuid.uuid4)
+
+    class Meta(User.Meta):
+        db_table = 'users'
 
 
 class Location(models.Model):
@@ -59,7 +71,7 @@ class Device(models.Model):
     device_type = models.CharField(max_length=2, null=False, choices=TYPE_CHOICES, default=ANDROID)
     device_imei = models.CharField(max_length=40, null=True)
     actual_location = models.OneToOneField(ActualLocation, on_delete=models.CASCADE)
-    owner = models.ForeignKey(UserModel, related_name='devices', on_delete=models.CASCADE)
+    owner = models.ForeignKey(CustomUser, related_name='devices', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'devices'

@@ -1,8 +1,10 @@
+import jwt
 from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 from rest_framework.test import APITestCase, APIRequestFactory
-from rest_framework_jwt.utils import jwt_get_secret_key
-from rest_framework_jwt.views import obtain_jwt_token
+from rest_framework_jwt.views import obtain_jwt_token, verify_jwt_token
 
+from TooPath3.models import CustomUser
 from TooPath3.users.views import *
 
 # DATA CONSTANTS
@@ -67,9 +69,14 @@ class UserTest(APITestCase):
 
 
 class TokenTest(APITestCase):
+    class PayloadObject:
+        def __init__(self, username, pk):
+            self.username = username
+            self.pk = pk
+
     def setUp(self):
         self.factory = APIRequestFactory()
-        UserModel.objects.create(username='test', password=make_password('test'))
+        self.user = CustomUser.objects.create(username="test", email='test@test.com', password=make_password('test'))
 
     """
     POST /login
@@ -99,3 +106,17 @@ class TokenTest(APITestCase):
         request = self.factory.post('/login', DATA_LOGIN_NO_USERNAME, format='json')
         response = obtain_jwt_token(request)
         self.assertEqual(response.data['username'], ['This field is required.'])
+
+    def test_given_existing_user__when_post_verify_token__with_generated_token__then_return_ok_status(self):
+        user_jwt_secret = str(self.user.jwt_secret)
+        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+        payload_object = TokenTest.PayloadObject(self.user.username, self.user.pk)
+        payload = jwt_payload_handler(payload_object)
+        token = jwt.encode(
+            payload,
+            user_jwt_secret,
+            api_settings.JWT_ALGORITHM
+        ).decode('utf-8')
+        request = self.factory.post('api-token-verify/', {"token": token}, format='json')
+        response = verify_jwt_token(request)
+        self.assertEqual(HTTP_200_OK, response.status_code)

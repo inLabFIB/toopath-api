@@ -1,8 +1,9 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
+
+from TooPath3.models import CustomUser
 
 
-class UserSerializer(serializers.ModelSerializer):
+class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = CustomUser
         fields = '__all__'
