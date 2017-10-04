@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework.test import APITestCase, APIRequestFactory
+from rest_framework_jwt.utils import jwt_get_secret_key
 from rest_framework_jwt.views import obtain_jwt_token
 
 from TooPath3.users.views import *
