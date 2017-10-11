@@ -10,12 +10,12 @@ workon toopath
 pip install -r requirements.txt
 
 # Migrate
-python manage.py migrate --settings=TooPath3.settings.production
+python manage.py migrate --settings=TooPath3.settings.production || exit 1
 
 # Start TooPath API
 PID_FILE=~/toopath-api/toopath.pid
 LOG_FILE=~/toopath-api/toopath.log
 HOST=$(hostname -i)
-export DJANGO_SETTINGS_MODULE=TooPath3.settings.production
-gunicorn -b ${HOST}:8080 -D --access-logfile ${LOG_FILE} --log-file ${LOG_FILE} -p ${PID_FILE} TooPath3.wsgi
+export DJANGO_SETTINGS_MODULE=TooPath3.settings.production || exit 1
+gunicorn -b ${HOST}:8080 -D --access-logfile ${LOG_FILE} --log-file ${LOG_FILE} -p ${PID_FILE} TooPath3.wsgi || exit 1
 
