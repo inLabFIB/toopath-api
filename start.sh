@@ -13,4 +13,9 @@ pip install -r requirements.txt
 python manage.py migrate --settings=TooPath3.settings.production
 
 # Start TooPath API
-python manage.py runserver 0.0.0.0:8080 --settings=TooPath3.settings.production >> toopath.log 2>&1 &
+PID_FILE=~/toopath-api/toopath.pid
+LOG_FILE=~/toopath-api/toopath.log
+HOST=$(hostname -i)
+export DJANGO_SETTINGS_MODULE=TooPath3.settings.production
+gunicorn -b ${HOST}:8080 -D --access-logfile ${LOG_FILE} --log-file ${LOG_FILE} -p ${PID_FILE} TooPath3.wsgi
+

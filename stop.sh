@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 
-# Stop CarGuard API
-if pgrep -f toopath/bin/python &> /dev/null ; then pkill -f toopath/bin/python; fi
+# Stop TooPath API
+PID_FILE=~/toopath-api/toopath.pid
+if pgrep -F $PID_FILE; then pkill -F $PID_FILE; fi
