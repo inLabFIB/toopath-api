@@ -1,6 +1,6 @@
 from .base import *
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['147.83.153.201', '147.83.153.208', '127.0.0.1']
 
