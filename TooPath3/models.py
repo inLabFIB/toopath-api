@@ -5,14 +5,11 @@ from django.contrib.gis.db import models as gismodels
 from django.contrib.auth.models import User as UserModel, AbstractUser, User
 
 
-class CustomUser(User):
+class CustomUser(AbstractUser):
     jwt_secret = models.UUIDField(
         'Token secret',
         help_text='Changing this will log out user everywhere',
         default=uuid.uuid4)
-
-    class Meta(User.Meta):
-        db_table = 'users'
 
 
 class Location(models.Model):
@@ -61,6 +58,7 @@ class Device(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False, null=False)
     updated_at = models.DateTimeField(auto_now=True, null=False)
     trash = models.BooleanField(null=False, default=False)
+    # TODO: decided if ip_address and port_number are mandatory
     ip_address = models.GenericIPAddressField(null=False)
     port_number = models.IntegerField(null=False)
     height = models.FloatField(null=True, default=None)
@@ -70,6 +68,7 @@ class Device(models.Model):
     device_privacy = models.CharField(max_length=2, null=False, choices=PRIVACY_CHOICES, default=PRIVATE)
     device_type = models.CharField(max_length=2, null=False, choices=TYPE_CHOICES, default=ANDROID)
     device_imei = models.CharField(max_length=40, null=True)
+    # TODO: change one to one field on device to actual location and set to primary key
     actual_location = models.OneToOneField(ActualLocation, on_delete=models.CASCADE)
     owner = models.ForeignKey(CustomUser, related_name='devices', on_delete=models.CASCADE)
 

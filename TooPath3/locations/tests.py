@@ -1,11 +1,10 @@
 from django.contrib.auth.hashers import make_password
 from django.contrib.gis.geos import Point
 from rest_framework.test import APITestCase, APIRequestFactory, force_authenticate
-from django.contrib.auth.models import User
 from rest_framework_jwt.settings import api_settings
 
 from TooPath3.locations.views import *
-from TooPath3.models import Device
+from TooPath3.models import Device, CustomUser
 
 # DATA constants
 VALID_DATA_LOCATION = {
@@ -29,8 +28,8 @@ INVALID_LONGITUDE_DATA_LOCATION = {
 class ActualLocationTests(APITestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
-        self.user = User.objects.create(username='test', password=make_password('password'))
-        self.user2 = User.objects.create(username='test2', password=make_password('password'))
+        self.user = CustomUser.objects.create(username='test', password=make_password('password'))
+        self.user2 = CustomUser.objects.create(username='test2', password=make_password('password'))
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
         jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
         payload = jwt_payload_handler(self.user)

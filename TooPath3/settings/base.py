@@ -134,3 +134,5 @@ JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
     'JWT_AUTH_COOKIE': None,
 }
+
+AUTH_USER_MODEL = 'TooPath3.CustomUser'

@@ -1,8 +1,7 @@
 import jwt
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
-from rest_framework.test import APITestCase, APIRequestFactory
-from rest_framework_jwt.views import obtain_jwt_token, verify_jwt_token
+from rest_framework.test import APITestCase, APIRequestFactory, APIClient
 
 from TooPath3.models import CustomUser
 from TooPath3.users.views import *
@@ -46,25 +45,21 @@ class UserTest(APITestCase):
     """
 
     def test_given_non_existing_users__when_post_users__with_username_email_and_password__then_return_created(self):
-        request = self.factory.post('/users', VALID_DATA_USER, format='json')
-        response = new_user(request)
+        response = self.client.post('/users/', VALID_DATA_USER, format='json')
         self.assertEqual(response.status_code, HTTP_201_CREATED)
 
     def test_given_non_existing_users__when_post_users__with_username_email_and_password__then_user_is_created(self):
-        request = self.factory.post('/users', VALID_DATA_USER, format='json')
-        new_user(request)
-        user = UserModel.objects.get(username='test')
+        self.client.post('/users/', VALID_DATA_USER, format='json')
+        user = CustomUser.objects.get(username='test')
         self.assertEqual(user.email, 'test@test.com')
 
     def test_given_non_existing_users__when_post_users__with_invalid_username_email_or_password__then_return_bad_request(
             self):
-        request = self.factory.post('/users', INVALID_DATA_USER, format='json')
-        response = new_user(request)
+        response = self.client.post('/users/', INVALID_DATA_USER, format='json')
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
 
     def test_given_non_existing_users__when_post_users__with_username_email_and_password__then_return_token(self):
-        request = self.factory.post('/users', VALID_DATA_USER, format='json')
-        response = new_user(request)
+        response = self.client.post('/users/', VALID_DATA_USER, format='json')
         self.assertIsNotNone(response.data['token'])
 
 
@@ -75,7 +70,7 @@ class TokenTest(APITestCase):
             self.pk = pk
 
     def setUp(self):
-        self.factory = APIRequestFactory()
+        self.client = APIClient()
         self.user = CustomUser.objects.create(username="test", email='test@test.com', password=make_password('test'))
 
     """
@@ -83,28 +78,23 @@ class TokenTest(APITestCase):
     """
 
     def test_given_existing_user__when_post_login__with_valid_username_and_password__then_return_ok(self):
-        request = self.factory.post('/login', VALID_DATA_LOGIN, format='json')
-        response = obtain_jwt_token(request)
+        response = self.client.post('/login/', VALID_DATA_LOGIN, format='json')
         self.assertEqual(response.status_code, HTTP_200_OK)
 
     def test_given_existing_user__when_post_login__with_valid_username_and_password__then_return_token(self):
-        request = self.factory.post('/login', VALID_DATA_LOGIN, format='json')
-        response = obtain_jwt_token(request)
+        response = self.client.post('/login/', VALID_DATA_LOGIN, format='json')
         self.assertIsNotNone(response.data['token'])
 
     def test_given_existing_user__when_post_login__with_invalid_username_or_password__then_return_bad_request(self):
-        request = self.factory.post('/login', INVALID_DATA_LOGIN, format='json')
-        response = obtain_jwt_token(request)
+        response = self.client.post('/login/', INVALID_DATA_LOGIN, format='json')
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
 
     def test_given_existing_user__when_post_login__with_no_password__then_return_password_needed_error(self):
-        request = self.factory.post('/login', DATA_LOGIN_NO_PASSWORD, format='json')
-        response = obtain_jwt_token(request)
+        response = self.client.post('/login/', DATA_LOGIN_NO_PASSWORD, format='json')
         self.assertEqual(response.data['password'], ['This field is required.'])
 
-    def test_given_existing_user__when_post_login__with_no_usernmae__then_return_username_needed_error(self):
-        request = self.factory.post('/login', DATA_LOGIN_NO_USERNAME, format='json')
-        response = obtain_jwt_token(request)
+    def test_given_existing_user__when_post_login__with_no_username__then_return_username_needed_error(self):
+        response = self.client.post('/login/', DATA_LOGIN_NO_USERNAME, format='json')
         self.assertEqual(response.data['username'], ['This field is required.'])
 
     def test_given_existing_user__when_post_verify_token__with_generated_token__then_return_ok_status(self):
@@ -117,6 +107,5 @@ class TokenTest(APITestCase):
             user_jwt_secret,
             api_settings.JWT_ALGORITHM
         ).decode('utf-8')
-        request = self.factory.post('api-token-verify/', {"token": token}, format='json')
-        response = verify_jwt_token(request)
-        self.assertEqual(HTTP_200_OK, response.status_code)
+        response = self.client.post('/api-token-verify/', {"token": token}, format='json')
+        self.assertEqual(response.status_code, HTTP_200_OK)
