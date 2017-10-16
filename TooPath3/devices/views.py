@@ -31,8 +31,6 @@ class DeviceDetail(APIView):
         data = JSONParser().parse(request)
         if 'name' not in data:
             data['name'] = device.name
-        if 'actual_location' not in data:
-            data['actual_location'] = device.actual_location
         serializer = DeviceSerializer(device, data=data)
         if serializer.is_valid():
             serializer.save()
