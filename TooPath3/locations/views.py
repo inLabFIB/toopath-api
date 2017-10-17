@@ -1,6 +1,5 @@
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.generics import get_object_or_404
-from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import *
@@ -29,11 +28,10 @@ class DeviceActualLocation(APIView):
 
     def put(self, request, pk):
         actual_location = self.get_object(pk)
-        data = JSONParser().parse(request)
+        data = request.data
         serializer = CoordinatesSerializer(data=data)
         if serializer.is_valid():
             geo_json = {
-                'device': actual_location.device,
                 'point': {
                     'type': 'Point',
                     'coordinates': [serializer.validated_data['latitude'], serializer.validated_data['longitude']]

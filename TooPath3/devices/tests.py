@@ -1,3 +1,5 @@
+from unittest import skip
+
 from django.contrib.auth.hashers import make_password
 from rest_framework.status import *
 from rest_framework.test import APITestCase, APIClient
@@ -114,22 +116,27 @@ class PostDevices(APITestCase):
         response = self.client.post('/devices/', VALID_DATA_POST_DEVICE)
         self.assertEqual(response.status_code, HTTP_201_CREATED)
 
+    @skip('Not implemented yet')
     def test_given_non_existing_device__when_post_device_with_invalid_information__then_return_bad_response_status(
             self):
         self.fail()
 
+    @skip('Not implemented yet')
     def test_given_non_existing_device__when_post_device_with_valid_information__then_check_device_database_entry_exist(
             self):
         self.fail()
 
+    @skip('Not implemented yet')
     def test_given_non_existing_device__when_post_device_with_valid_information__then_return_device_information_on_response(
             self):
         self.fail()
 
+    @skip('Not implemented yet')
     def test_given_non_existing_device__when_post_device_with_valid_information__then_owner_corresponds_with_token(
             self):
         self.fail()
 
+    @skip('Not implemented yet')
     def test_given_non_existing_device__when_post_device_with_invalid_information__then_has_relation_with_actual_location_entry_exist(
             self):
         self.fail()

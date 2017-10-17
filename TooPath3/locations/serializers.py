@@ -1,8 +1,7 @@
 from rest_framework import serializers
-from rest_framework_gis import serializers as gis_serializers
+from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
 from TooPath3.constants import DEFAULT_ERROR_MESSAGES
-from TooPath3.devices.serializers import DeviceSerializer
 from TooPath3.models import ActualLocation
 
 
@@ -11,13 +10,13 @@ class CoordinatesSerializer(serializers.Serializer):
     longitude = serializers.FloatField()
 
 
-class ActualLocationSerializer(gis_serializers.GeoFeatureModelSerializer):
-    device = DeviceSerializer(required=True)
+class ActualLocationSerializer(GeoFeatureModelSerializer):
 
     class Meta:
         model = ActualLocation
         geo_field = 'point'
         fields = '__all__'
+        read_only_fields = ('device',)
 
     def validate(self, data):
         if (data['point'].x < -90.0) or (data['point'].x > 90.0):
