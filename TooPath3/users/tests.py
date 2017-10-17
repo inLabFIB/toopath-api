@@ -33,16 +33,13 @@ DATA_LOGIN_NO_USERNAME = {
 UserModel = get_user_model()
 
 
-class UserTest(APITestCase):
-    def setUp(self):
-        self.factory = APIRequestFactory()
-
-    """
-    GET  /users
-    """
+class PostUsers(APITestCase):
     """
     POST /users
     """
+
+    def setUp(self):
+        self.factory = APIRequestFactory()
 
     def test_given_non_existing_users__when_post_users__with_username_email_and_password__then_return_created(self):
         response = self.client.post('/users/', VALID_DATA_USER, format='json')
@@ -63,7 +60,11 @@ class UserTest(APITestCase):
         self.assertIsNotNone(response.data['token'])
 
 
-class TokenTest(APITestCase):
+class LoginTest(APITestCase):
+    """
+    POST /login
+    """
+
     class PayloadObject:
         def __init__(self, username, pk):
             self.username = username
@@ -72,10 +73,6 @@ class TokenTest(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = CustomUser.objects.create(username="test", email='test@test.com', password=make_password('test'))
-
-    """
-    POST /login
-    """
 
     def test_given_existing_user__when_post_login__with_valid_username_and_password__then_return_ok(self):
         response = self.client.post('/login/', VALID_DATA_LOGIN, format='json')
@@ -100,7 +97,7 @@ class TokenTest(APITestCase):
     def test_given_existing_user__when_post_verify_token__with_generated_token__then_return_ok_status(self):
         user_jwt_secret = str(self.user.jwt_secret)
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-        payload_object = TokenTest.PayloadObject(self.user.username, self.user.pk)
+        payload_object = LoginTest.PayloadObject(self.user.username, self.user.pk)
         payload = jwt_payload_handler(payload_object)
         token = jwt.encode(
             payload,

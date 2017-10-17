@@ -25,7 +25,7 @@ INVALID_LONGITUDE_DATA_LOCATION = {
 }
 
 
-class ActualLocationTests(APITestCase):
+class GetActualLocation(APITestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
         self.user = CustomUser.objects.create(username='test', password=make_password('password'))
@@ -38,8 +38,9 @@ class ActualLocationTests(APITestCase):
         self.token2 = jwt_encode_handler(payload)
         device = Device.objects.create(did=1, name='car', ip_address='0.0.0.0', device_type='ad', device_privacy='pr',
                                        owner=self.user, port_number='8080')
-        device.actual_location.point = Point(30, 1)
-        device.actual_location.save()
+        actual_location = ActualLocation.objects.get(device=device.did)
+        actual_location.point = Point(30, 1)
+        actual_location.save()
 
     """
     GET /devices/:id/actualLocation
@@ -73,15 +74,33 @@ class ActualLocationTests(APITestCase):
         expected_response_content = b'{"id":1,"type":"Feature","geometry":{"type":"Point","coordinates":[30.0,1.0]}'
         self.assertIn(expected_response_content, response.content)
 
+
+class PutActualLocation(APITestCase):
     """
     PUT /devices/:id/actualLocation
     """
+
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        self.user = CustomUser.objects.create(username='test', password=make_password('password'))
+        self.user2 = CustomUser.objects.create(username='test2', password=make_password('password'))
+        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+        payload = jwt_payload_handler(self.user)
+        self.token = jwt_encode_handler(payload)
+        payload = jwt_payload_handler(self.user2)
+        self.token2 = jwt_encode_handler(payload)
+        device = Device.objects.create(did=1, name='car', ip_address='0.0.0.0', device_type='ad', device_privacy='pr',
+                                       owner=self.user, port_number='8080')
+        actual_location = ActualLocation.objects.get(device=device.did)
+        actual_location.point = Point(30, 1)
+        actual_location.save()
 
     def test_given_existing_device__when_put_device_actual_location_with_existing_device_id__then_return_ok(self):
         request = self.factory.put('/devices/1/actualLocation', VALID_DATA_LOCATION, format='json')
         force_authenticate(request, user=self.user, token=self.token)
         response = DeviceActualLocation.as_view()(request, pk=1)
-        self.assertEqual(response.status_code, HTTP_201_CREATED)
+        self.assertEqual(response.status_code, HTTP_200_OK)
 
     def test_given_existing_device__when_put_device_actual_location_with_invalid_data__then_return_bad_request(self):
         request = self.factory.put('/devices/1/actualLocation', INVALID_DATA_LOCATION, format='json')

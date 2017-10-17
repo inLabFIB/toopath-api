@@ -33,6 +33,7 @@ class DeviceActualLocation(APIView):
         serializer = CoordinatesSerializer(data=data)
         if serializer.is_valid():
             geo_json = {
+                'device': actual_location.device,
                 'point': {
                     'type': 'Point',
                     'coordinates': [serializer.validated_data['latitude'], serializer.validated_data['longitude']]
@@ -41,5 +42,5 @@ class DeviceActualLocation(APIView):
             serializer = ActualLocationSerializer(actual_location, data=geo_json)
             if serializer.is_valid():
                 serializer.save()
-                return Response(status=HTTP_201_CREATED)
+                return Response(status=HTTP_200_OK)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)

@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework_gis import serializers as gis_serializers
 
 from TooPath3.constants import DEFAULT_ERROR_MESSAGES
+from TooPath3.devices.serializers import DeviceSerializer
 from TooPath3.models import ActualLocation
 
 
@@ -11,6 +12,8 @@ class CoordinatesSerializer(serializers.Serializer):
 
 
 class ActualLocationSerializer(gis_serializers.GeoFeatureModelSerializer):
+    device = DeviceSerializer(required=True)
+
     class Meta:
         model = ActualLocation
         geo_field = 'point'
