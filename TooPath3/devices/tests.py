@@ -1,9 +1,8 @@
 from django.contrib.auth.hashers import make_password
 from rest_framework.status import *
-from rest_framework.test import APITestCase, force_authenticate, APIClient
+from rest_framework.test import APITestCase, APIClient
 from rest_framework_jwt.settings import api_settings
 
-from TooPath3.devices.views import DeviceDetail
 from TooPath3.models import Device, CustomUser
 
 # DATA CONSTANTS
@@ -23,7 +22,37 @@ INVALID_DATA_PUT_DEVICE = {
 }
 
 
-class DevicesTest(APITestCase):
+class GetDevice(APITestCase):
+    """
+    GET /devices/:id
+    """
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = CustomUser.objects.create(username='test', password=make_password('password'))
+        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+        payload = jwt_payload_handler(self.user)
+        self.token = jwt_encode_handler(payload)
+        Device.objects.create(did=1, name='car', ip_address='0.0.0.0', device_type='ad', device_privacy='pr',
+                              port_number='8080', owner=self.user)
+
+    def test_given_existing_device__when_get_device_with_existing_device_id__then_return_ok(self):
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
+        response = self.client.get('/devices/1/', format='json')
+        self.assertEqual(response.status_code, HTTP_200_OK)
+
+    def test_given_existing_device__when_get_device_with_non_existing_device_id__then_return_not_found(self):
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
+        response = self.client.get('/devices/10/', format='json')
+        self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
+
+
+class PutDevice(APITestCase):
+    """
+    PUT /devices/:id
+    """
+
     def setUp(self):
         self.client = APIClient()
         self.user = CustomUser.objects.create(username='test', password=make_password('password'))
@@ -37,24 +66,6 @@ class DevicesTest(APITestCase):
         self.user2 = CustomUser.objects.create(username='test2', password=make_password('password'))
         payload = jwt_payload_handler(self.user2)
         self.token2 = jwt_encode_handler(payload)
-
-    """ 
-    GET /devices/:id
-    """
-
-    def test_given_existing_device__when_get_device_with_existing_device_id__then_return_ok(self):
-        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
-        response = self.client.get('/devices/1/', format='json')
-        self.assertEqual(response.status_code, HTTP_200_OK)
-
-    def test_given_existing_device__when_get_device_with_non_existing_device_id__then_return_not_found(self):
-        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
-        response = self.client.get('/devices/10/', format='json')
-        self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
-
-    """ 
-    PUT /devices/:id
-    """
 
     def test_given_existing_device__when_put_device_with_existing_device_id_and_valid_data__then_return_ok(self):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
@@ -84,9 +95,19 @@ class DevicesTest(APITestCase):
         response = self.client.put('/devices/1/', VALID_DATA_PUT_DEVICE, format='json')
         self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
 
+
+class PostDevices(APITestCase):
     """
     POST /devices
     """
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = CustomUser.objects.create(username='test', password=make_password('password'))
+        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+        payload = jwt_payload_handler(self.user)
+        self.token = jwt_encode_handler(payload)
 
     def test_given_non_existing_device__when_post_device_with_valid_information__then_return_created_status(self):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
