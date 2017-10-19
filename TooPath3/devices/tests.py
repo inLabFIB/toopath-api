@@ -3,9 +3,10 @@ from unittest import skip
 from django.contrib.auth.hashers import make_password
 from rest_framework.status import *
 from rest_framework.test import APITestCase, APIClient
+from rest_framework_jwt.serializers import jwt_decode_handler, jwt_get_username_from_payload
 from rest_framework_jwt.settings import api_settings
 
-from TooPath3.models import Device, CustomUser
+from TooPath3.models import Device, CustomUser, ActualLocation
 
 # DATA CONSTANTS
 VALID_DATA_POST_DEVICE = {
@@ -14,6 +15,13 @@ VALID_DATA_POST_DEVICE = {
     "port_number": 8000,
     "device_type": "ad",
     "device_privacy": "pr"
+}
+INVALID_DATA_POST_DEVICE = {
+    "name": "test",
+    "ip": "127.0.0.1",
+    "port": 8000,
+    "type": "ad",
+    "privacy": "pr"
 }
 VALID_DATA_PUT_DEVICE = {
     "ip_address": "127.0.0.1",
@@ -116,27 +124,36 @@ class PostDevices(APITestCase):
         response = self.client.post('/devices/', VALID_DATA_POST_DEVICE)
         self.assertEqual(response.status_code, HTTP_201_CREATED)
 
-    @skip('Not implemented yet')
     def test_given_non_existing_device__when_post_device_with_invalid_information__then_return_bad_response_status(
             self):
-        self.fail()
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
+        response = self.client.post('/devices/', INVALID_DATA_POST_DEVICE)
+        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
 
-    @skip('Not implemented yet')
     def test_given_non_existing_device__when_post_device_with_valid_information__then_check_device_database_entry_exist(
             self):
-        self.fail()
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
+        response = self.client.post('/devices/', VALID_DATA_POST_DEVICE)
+        device = Device.objects.get(pk=response.data['did'])
+        self.assertIsNotNone(device)
 
-    @skip('Not implemented yet')
     def test_given_non_existing_device__when_post_device_with_valid_information__then_return_device_information_on_response(
             self):
-        self.fail()
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
+        response = self.client.post('/devices/', VALID_DATA_POST_DEVICE)
+        self.assertEqual(response.data['owner'], 'test')
 
-    @skip('Not implemented yet')
     def test_given_non_existing_device__when_post_device_with_valid_information__then_owner_corresponds_with_token(
             self):
-        self.fail()
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
+        response = self.client.post('/devices/', VALID_DATA_POST_DEVICE)
+        payload = jwt_decode_handler(self.token)
+        username = jwt_get_username_from_payload(payload)
+        self.assertEqual(response.data['owner'], username)
 
-    @skip('Not implemented yet')
-    def test_given_non_existing_device__when_post_device_with_invalid_information__then_has_relation_with_actual_location_entry_exist(
+    def test_given_non_existing_device__when_post_device_with_valid_information__then_has_relation_with_actual_location_entry_exist(
             self):
-        self.fail()
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
+        response = self.client.post('/devices/', VALID_DATA_POST_DEVICE)
+        device = Device.objects.get(pk=response.data['did'])
+        self.assertIsInstance(device.actuallocation, ActualLocation)

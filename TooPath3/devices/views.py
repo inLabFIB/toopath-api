@@ -47,5 +47,5 @@ class DevicesDetail(APIView):
         serializer = DeviceSerializer(data=data)
         if serializer.is_valid():
             serializer.save(owner=request.user)
-            return Response(serializer.validated_data, HTTP_201_CREATED)
+            return Response(serializer.data, HTTP_201_CREATED)
         return Response(serializer.errors, HTTP_400_BAD_REQUEST)
