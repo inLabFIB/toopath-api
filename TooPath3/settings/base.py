@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'v5ni3q=zj4p*#(#m3b$($%q*w5o0+ij$a8$m_mb7#%xq5*%#$@'
+SECRET_KEY = os.getenv('TOOPATH3_SECRET_KEY', 'v5ni3q=zj4p*#(#m3b$($%q*w5o0+ij$a8$m_mb7#%xq5*%#$@')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'rest_framework',
     'rest_framework_gis',
-    'TooPath3.apps.TooPathConfig',
     'rest_framework_jwt',
+    'TooPath3.apps.TooPathConfig',
 ]
 
 MIDDLEWARE = [
@@ -55,6 +55,23 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'TooPath3.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'templates')]
+        ,
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
 
 WSGI_APPLICATION = 'TooPath3.wsgi.application'
 
@@ -134,3 +151,5 @@ JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
     'JWT_AUTH_COOKIE': None,
 }
+
+AUTH_USER_MODEL = 'TooPath3.CustomUser'

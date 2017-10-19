@@ -5,8 +5,7 @@ from django.dispatch import receiver
 from TooPath3.models import Device, ActualLocation
 
 
-@receiver(pre_save, sender=Device)
-def create_device(sender, instance, **kwargs):
-    if not instance.actual_location_id:
-        ActualLocation.objects.create(pk=instance.did, point=Point())
-        instance.actual_location_id = instance.did
+@receiver(post_save, sender=Device)
+def create_device(sender, instance, created, raw, **kwargs):
+    if not ActualLocation.objects.filter(pk=instance).exists() and created:
+        ActualLocation.objects.create(device=instance, point=Point())

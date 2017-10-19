@@ -1,6 +1,5 @@
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.generics import get_object_or_404
-from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import *
@@ -29,7 +28,7 @@ class DeviceActualLocation(APIView):
 
     def put(self, request, pk):
         actual_location = self.get_object(pk)
-        data = JSONParser().parse(request)
+        data = request.data
         serializer = CoordinatesSerializer(data=data)
         if serializer.is_valid():
             geo_json = {
@@ -41,5 +40,5 @@ class DeviceActualLocation(APIView):
             serializer = ActualLocationSerializer(actual_location, data=geo_json)
             if serializer.is_valid():
                 serializer.save()
-                return Response(status=HTTP_201_CREATED)
+                return Response(status=HTTP_200_OK)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
