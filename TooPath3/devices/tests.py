@@ -87,7 +87,7 @@ class PutDevice(APITestCase):
         response = self.client.put('/devices/10/', VALID_DATA_PUT_DEVICE, format='json')
         self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
 
-    def test_given_existing_device__when_put_device_with_existing_device_id_and_invalid_data__then_return_ok(self):
+    def test_given_existing_device__when_put_device_with_existing_device_id_and_invalid_data__then_return_bad_request(self):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
         response = self.client.put('/devices/1/', INVALID_DATA_PUT_DEVICE, format='json')
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)

@@ -5,8 +5,8 @@ from TooPath3.users import views as users_views
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
 
 urlpatterns = [
-    url(r'^devices/(?P<id>[0-9]+)/actualLocation/$', locations_views.DeviceActualLocation.as_view()),
-    url(r'^devices/(?P<id>[0-9]+)/$', devices_views.DeviceDetail.as_view()),
+    url(r'^devices/(?P<pk>[0-9]+)/actualLocation/$', locations_views.DeviceActualLocation.as_view()),
+    url(r'^devices/(?P<pk>[0-9]+)/$', devices_views.DeviceDetail.as_view()),
     url(r'^devices/$', devices_views.DevicesDetail.as_view()),
     url(r'^users/$', users_views.new_user),
     url(r'^login/$', obtain_jwt_token),
