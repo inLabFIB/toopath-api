@@ -39,8 +39,7 @@ class Device(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False, null=False)
     updated_at = models.DateTimeField(auto_now=True, null=False)
     trash = models.BooleanField(null=False, default=False)
-    # TODO: decided if ip_address and port_number are mandatory
-    ip_address = models.GenericIPAddressField(null=False)
+    ip_address = models.GenericIPAddressField(null=True)
     port_number = models.IntegerField(null=False)
     height = models.FloatField(null=True, default=None)
     speed = models.FloatField(null=True, default=None)
@@ -53,6 +52,16 @@ class Device(models.Model):
 
     class Meta:
         db_table = 'devices'
+
+
+class Tracks(models.Model):
+    tid = models.AutoField(primary_key=True, db_index=True, editable=False)
+    name = models.CharField(max_length=100, null=False)
+    description = models.CharField(max_length=200, null=True)
+    device = models.ForeignKey(Device, null=False)
+
+    class Meta:
+        db_table = 'tracks'
 
 
 class Location(models.Model):
