@@ -17,8 +17,13 @@ class PostTracksCase(APITestCase):
         response = self.client.post('/devices/100/tracks/', {})
         self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
 
-    def test_return_403_status_when_user_doesnt_have_permissions(self):
+    def test_return_403_status_when_user_has_not_permissions(self):
         owner = CustomUser.objects.create(username='owner', password=make_password('password'))
         device = Device.objects.create(name='device_test', device_type='ad', device_privacy='pr', owner=owner)
         response = self.client.post('/devices/' + str(device.did) + '/tracks/', {})
         self.assertEqual(HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_return_401_status_when_user_is_not_authenticated(self):
+        self.client.credentials(HTTP_AUTHORIZATION='')
+        response = self.client.post('/devices/100/tracks/', {})
+        self.assertEqual(HTTP_401_UNAUTHORIZED, response.status_code)
