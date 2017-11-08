@@ -58,7 +58,7 @@ class Track(models.Model):
     tid = models.AutoField(primary_key=True, db_index=True, editable=False)
     name = models.CharField(max_length=100, null=False)
     description = models.CharField(max_length=200, null=True)
-    device = models.ForeignKey(Device, null=False)
+    device = models.ForeignKey(Device, related_name='tracks', null=False)
 
     class Meta:
         db_table = 'tracks'

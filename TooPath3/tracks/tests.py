@@ -32,3 +32,9 @@ class PostTracksCase(APITestCase):
         device = Device.objects.create(name='device_test', device_type='ad', device_privacy='pr', owner=self.user)
         response = self.client.post('/devices/' + str(device.did) + '/tracks/', {"description": "name missing"})
         self.assertEqual(HTTP_400_BAD_REQUEST, response.status_code)
+
+    def test_return_201_status_when_track_is_created(self):
+        device = Device.objects.create(name='device_test', device_type='ad', device_privacy='pr', owner=self.user)
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/',
+                                    {"name": "test_track", "description": "this is a description"})
+        self.assertEqual(HTTP_201_CREATED, response.status_code)
