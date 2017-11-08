@@ -17,10 +17,7 @@ VALID_DATA_POST_DEVICE = {
     "device_privacy": "pr"
 }
 INVALID_DATA_POST_DEVICE = {
-    "name": "test",
-    "ip": "127.0.0.1",
-    "port": 8000,
-    "type": "ad",
+    "nam": "test",
     "privacy": "pr"
 }
 VALID_DATA_PUT_DEVICE = {
@@ -28,7 +25,7 @@ VALID_DATA_PUT_DEVICE = {
     "port_number": 8000
 }
 INVALID_DATA_PUT_DEVICE = {
-    "ip": "127.0.0.1"
+    "naa": "name"
 }
 
 
@@ -86,11 +83,6 @@ class PutDevice(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
         response = self.client.put('/devices/10/', VALID_DATA_PUT_DEVICE, format='json')
         self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
-
-    def test_given_existing_device__when_put_device_with_existing_device_id_and_invalid_data__then_return_bad_request(self):
-        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
-        response = self.client.put('/devices/1/', INVALID_DATA_PUT_DEVICE, format='json')
-        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
 
     def test_given_existing_device__when_put_device_with_existing_device_id_and_valid_data__then_return_ip_address(
             self):
