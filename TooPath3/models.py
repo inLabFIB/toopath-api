@@ -54,7 +54,7 @@ class Device(models.Model):
         db_table = 'devices'
 
 
-class Tracks(models.Model):
+class Track(models.Model):
     tid = models.AutoField(primary_key=True, db_index=True, editable=False)
     name = models.CharField(max_length=100, null=False)
     description = models.CharField(max_length=200, null=True)
@@ -84,6 +84,6 @@ class ActualLocation(Location):
         db_table = 'actual_locations'
 
 
-class RouteLocation(Location):
+class TrackLocation(Location):
     class Meta(Location.Meta):
-        db_table = 'route_locations'
+        db_table = 'track_locations'
