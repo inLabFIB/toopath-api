@@ -25,6 +25,7 @@ class TracksList(APIView):
         request.data['device'] = device.did
         serializer = TrackSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=HTTP_201_CREATED)
+            track = serializer.save()
+            track_json = TrackSerializer(track).data
+            return Response(track_json, status=HTTP_201_CREATED)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)

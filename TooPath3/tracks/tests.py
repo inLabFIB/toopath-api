@@ -2,7 +2,7 @@ from django.contrib.auth.hashers import make_password
 from rest_framework.status import *
 from rest_framework.test import APITestCase, APIClient
 
-from TooPath3.models import CustomUser, Device
+from TooPath3.models import CustomUser, Device, Track
 from TooPath3.users.utils import generate_token_for_testing
 
 
@@ -38,3 +38,17 @@ class PostTracksCase(APITestCase):
         response = self.client.post('/devices/' + str(device.did) + '/tracks/',
                                     {"name": "test_track", "description": "this is a description"})
         self.assertEqual(HTTP_201_CREATED, response.status_code)
+
+    def test_instance_exists_when_track_is_created(self):
+        device = Device.objects.create(name='device_test', device_type='ad', device_privacy='pr', owner=self.user)
+        self.client.post('/devices/' + str(device.did) + '/tracks/',
+                         {"name": "test_track", "description": "this is a description"})
+        track = Track.objects.get(pk=1)
+        self.assertIsNotNone(track)
+
+    def test_return_json_with_instance_info_when_track_is_created(self):
+        device = Device.objects.create(name='device_test', device_type='ad', device_privacy='pr', owner=self.user)
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/',
+                                    {"name": "test_track", "description": "this is a description"})
+        self.assertEqual({'tid': response.data['tid'], 'name': 'test_track', 'description': "this is a description",
+                          "device": device.did}, response.data)
