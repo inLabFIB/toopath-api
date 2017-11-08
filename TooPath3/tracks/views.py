@@ -2,11 +2,13 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.status import *
 from rest_framework.views import APIView
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from TooPath3.devices.permissions import IsOwnerOrReadOnly
 from TooPath3.models import Device
+from TooPath3.tracks.serializers import TrackSerializer
 
 
 class TracksList(APIView):
@@ -20,4 +22,7 @@ class TracksList(APIView):
 
     def post(self, request, pk):
         device = self.get_object(pk)
-        return Response()
+        serializer = TrackSerializer(data=request.data)
+        if serializer.is_valid():
+            return Response()
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)

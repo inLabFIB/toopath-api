@@ -27,3 +27,8 @@ class PostTracksCase(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='')
         response = self.client.post('/devices/100/tracks/', {})
         self.assertEqual(HTTP_401_UNAUTHORIZED, response.status_code)
+
+    def test_return_400_status_when_json_body_is_invalid(self):
+        device = Device.objects.create(name='device_test', device_type='ad', device_privacy='pr', owner=self.user)
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/', {"description": "name missing"})
+        self.assertEqual(HTTP_400_BAD_REQUEST, response.status_code)
