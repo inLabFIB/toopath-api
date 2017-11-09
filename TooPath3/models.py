@@ -85,5 +85,7 @@ class ActualLocation(Location):
 
 
 class TrackLocation(Location):
+    track = models.ForeignKey(Track, related_name='locations', null=False)
+
     class Meta(Location.Meta):
         db_table = 'track_locations'
