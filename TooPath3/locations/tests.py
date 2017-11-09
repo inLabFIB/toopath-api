@@ -1,12 +1,14 @@
 from django.contrib.auth.hashers import make_password
 from django.contrib.gis.geos import Point
-from rest_framework.test import APITestCase, APIRequestFactory, force_authenticate
+from rest_framework.test import APITestCase, APIRequestFactory, force_authenticate, APIClient
 from rest_framework_jwt.settings import api_settings
 
 from TooPath3.locations.views import *
 from TooPath3.models import Device, CustomUser
 
 # DATA constants
+from TooPath3.users.utils import generate_token_for_testing
+
 VALID_DATA_LOCATION = {
     'latitude': 40.0,
     'longitude': 2.0
@@ -156,3 +158,22 @@ class PutActualLocation(APITestCase):
         force_authenticate(request, user=self.user, token=self.token)
         response = DeviceActualLocation.as_view()(request, pk=1)
         self.assertEqual(response.data, {'non_field_errors': ['Enter a valid longitude.']})
+
+
+class PostTrackLocationCase(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = CustomUser.objects.create(username='user_test', password=make_password('password'))
+        self.token = generate_token_for_testing(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
+
+    def test_return_404_when_device_not_exists(self):
+        device = Device.objects.create(name='device_test', device_type='ad', device_privacy='pr', owner=self.user)
+        track = Track.objects.create(name='track_test', device=device)
+        response = self.client.post('/devices/100/tracks/' + str(track.tid) + '/trackLocations/', {})
+        self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_return_404_when_track_not_exists(self):
+        device = Device.objects.create(name='device_test', device_type='ad', device_privacy='pr', owner=self.user)
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/100/trackLocations/', {})
+        self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
