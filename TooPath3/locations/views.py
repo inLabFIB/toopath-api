@@ -45,12 +45,15 @@ class DeviceActualLocation(APIView):
 
 
 class TrackLocationList(APIView):
+    authentication_classes = (JSONWebTokenAuthentication, SessionAuthentication, BasicAuthentication,)
+    permission_classes = (IsAuthenticated, IsOwnerOrReadOnly,)
+
     def get_object(self, pk):
         obj = get_object_or_404(Track, pk=pk)
         self.check_object_permissions(self.request, obj=obj)
         return obj
 
     def post(self, request, d_pk, tl_pk):
-        get_object_or_404(Device, d_pk)
+        get_object_or_404(Device, pk=d_pk)
         track = self.get_object(tl_pk)
-        return Response()
+        return Response(status=HTTP_201_CREATED)
