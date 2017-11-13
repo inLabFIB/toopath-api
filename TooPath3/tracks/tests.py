@@ -3,7 +3,7 @@ from rest_framework.status import *
 from rest_framework.test import APITestCase, APIClient
 
 from TooPath3.models import CustomUser, Device, Track
-from TooPath3.users.utils import generate_token_for_testing
+from TooPath3.utils import generate_token_for_testing
 
 
 class PostTracksCase(APITestCase):

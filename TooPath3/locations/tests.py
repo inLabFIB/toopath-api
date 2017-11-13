@@ -6,9 +6,8 @@ from rest_framework_jwt.settings import api_settings
 from TooPath3.constants import DEFAULT_ERROR_MESSAGES
 from TooPath3.locations.views import *
 from TooPath3.models import Device, CustomUser, TrackLocation
-
 # DATA constants
-from TooPath3.users.utils import generate_token_for_testing
+from TooPath3.utils import generate_token_for_testing, get_latest_id_inserted
 
 VALID_DATA_LOCATION = {
     'latitude': 40.0,
@@ -212,9 +211,9 @@ class PostTrackLocationCase(APITestCase):
         device = _create_device_with_owner(self.user)
         track = self._create_track(device)
         json_body = {'point': {'type': 'Point', 'coordinates': [90, 90]}}
-        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
-                                    json_body)
-        track_location = self._get_track_location_by_id(response.data['id'])
+        self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
+                         json_body)
+        track_location = self._get_track_location_by_id(get_latest_id_inserted(TrackLocation))
         self.assertIsNotNone(track_location)
 
     def test_return_json_with_instance_info_status_when_track_location_created(self):
@@ -223,7 +222,8 @@ class PostTrackLocationCase(APITestCase):
         json_body = {'point': {'type': 'Point', 'coordinates': [90, 90]}}
         response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
                                     json_body)
-        expected_json = TrackLocationSerializer(self._get_track_location_by_id(response.data['id'])).data
+        expected_json = TrackLocationSerializer(
+            self._get_track_location_by_id(get_latest_id_inserted(TrackLocation))).data
         self.assertEqual(expected_json, response.data)
 
     def test_return_invalid_latitude_error_when_body_has_invalid_latitude(self):
