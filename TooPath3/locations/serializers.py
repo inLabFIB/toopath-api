@@ -18,10 +18,7 @@ class ActualLocationSerializer(GeoFeatureModelSerializer):
         read_only_fields = ('device',)
 
     def validate(self, data):
-        if (data['point'].x < -90.0) or (data['point'].x > 90.0):
-            raise serializers.ValidationError(DEFAULT_ERROR_MESSAGES['invalid_latitude'])
-        if (data['point'].y < -180) or (data['point'].y > 180):
-            raise serializers.ValidationError(DEFAULT_ERROR_MESSAGES['invalid_longitude'])
+        _validate_latitude_and_longitude(data)
         return data
 
 
@@ -30,3 +27,14 @@ class TrackLocationSerializer(GeoFeatureModelSerializer):
         model = TrackLocation
         geo_field = 'point'
         fields = '__all__'
+
+    def validate(self, data):
+        _validate_latitude_and_longitude(data)
+        return data
+
+
+def _validate_latitude_and_longitude(data):
+    if (data['point'].x < -90.0) or (data['point'].x > 90.0):
+        raise serializers.ValidationError(DEFAULT_ERROR_MESSAGES['invalid_latitude'])
+    if (data['point'].y < -180) or (data['point'].y > 180):
+        raise serializers.ValidationError(DEFAULT_ERROR_MESSAGES['invalid_longitude'])

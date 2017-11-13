@@ -3,6 +3,7 @@ from django.contrib.gis.geos import Point
 from rest_framework.test import APITestCase, APIRequestFactory, force_authenticate, APIClient
 from rest_framework_jwt.settings import api_settings
 
+from TooPath3.constants import DEFAULT_ERROR_MESSAGES
 from TooPath3.locations.views import *
 from TooPath3.models import Device, CustomUser, TrackLocation
 
@@ -223,6 +224,24 @@ class PostTrackLocationCase(APITestCase):
         response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
                                     json_body)
         expected_json = TrackLocationSerializer(self._get_track_location_by_id(response.data['id'])).data
+        self.assertEqual(expected_json, response.data)
+
+    def test_return_invalid_latitude_error_when_body_has_invalid_latitude(self):
+        device = _create_device_with_owner(self.user)
+        track = self._create_track(device)
+        json_body = {'point': {'type': 'Point', 'coordinates': [91, 90]}}
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
+                                    json_body)
+        expected_json = {'non_field_errors': [DEFAULT_ERROR_MESSAGES['invalid_latitude']]}
+        self.assertEqual(expected_json, response.data)
+
+    def test_return_invalid_longitude_error_when_body_has_invalid_longitude(self):
+        device = _create_device_with_owner(self.user)
+        track = self._create_track(device)
+        json_body = {'point': {'type': 'Point', 'coordinates': [1, 181]}}
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
+                                    json_body)
+        expected_json = {'non_field_errors': [DEFAULT_ERROR_MESSAGES['invalid_longitude']]}
         self.assertEqual(expected_json, response.data)
 
     def _create_track(self, device):
