@@ -190,3 +190,11 @@ class PostTrackLocationCase(APITestCase):
         response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
                                     {})
         self.assertEqual(HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_return_400_status_when_json_body_is_invalid(self):
+        device = Device.objects.create(name='device_test', device_type='ad', device_privacy='pr', owner=self.user)
+        track = Track.objects.create(name='track_test', device=device)
+        json_body_invalid = {'location': {'type': 'Point', 'coordinates': [1, 2]}}
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
+                                    json_body_invalid)
+        self.assertEqual(HTTP_400_BAD_REQUEST, response.status_code)

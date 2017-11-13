@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from TooPath3.devices.permissions import IsOwnerOrReadOnly
-from TooPath3.locations.serializers import CoordinatesSerializer, ActualLocationSerializer
+from TooPath3.locations.serializers import CoordinatesSerializer, ActualLocationSerializer, TrackLocationSerializer
 from TooPath3.models import ActualLocation, Track, Device
 
 
@@ -56,4 +56,8 @@ class TrackLocationList(APIView):
     def post(self, request, d_pk, tl_pk):
         get_object_or_404(Device, pk=d_pk)
         track = self.get_object(tl_pk)
-        return Response(status=HTTP_201_CREATED)
+        request.data['track'] = track.tid
+        serializer = TrackLocationSerializer(data=request.data)
+        if serializer.is_valid():
+            return Response(status=HTTP_201_CREATED)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)

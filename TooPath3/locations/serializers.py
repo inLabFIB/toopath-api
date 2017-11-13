@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
 from TooPath3.constants import DEFAULT_ERROR_MESSAGES
-from TooPath3.models import ActualLocation
+from TooPath3.models import ActualLocation, TrackLocation
 
 
 class CoordinatesSerializer(serializers.Serializer):
@@ -11,7 +11,6 @@ class CoordinatesSerializer(serializers.Serializer):
 
 
 class ActualLocationSerializer(GeoFeatureModelSerializer):
-
     class Meta:
         model = ActualLocation
         geo_field = 'point'
@@ -24,3 +23,10 @@ class ActualLocationSerializer(GeoFeatureModelSerializer):
         if (data['point'].y < -180) or (data['point'].y > 180):
             raise serializers.ValidationError(DEFAULT_ERROR_MESSAGES['invalid_longitude'])
         return data
+
+
+class TrackLocationSerializer(GeoFeatureModelSerializer):
+    class Meta:
+        model = TrackLocation
+        geo_field = 'point'
+        fields = '__all__'
