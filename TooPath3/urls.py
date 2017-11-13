@@ -6,6 +6,7 @@ from TooPath3.tracks import views as tracks_views
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
 
 urlpatterns = [
+    url(r'^devices/(?P<d_pk>[0-9]+)/tracks/(?P<tl_pk>[0-9]+)/trackLocations/$', locations_views.TrackLocationList.as_view()),
     url(r'^devices/(?P<pk>[0-9]+)/tracks/$', tracks_views.TracksList.as_view()),
     url(r'^devices/(?P<pk>[0-9]+)/actualLocation/$', locations_views.DeviceActualLocation.as_view()),
     url(r'^devices/(?P<pk>[0-9]+)/$', devices_views.DeviceDetail.as_view()),

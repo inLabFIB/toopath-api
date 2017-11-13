@@ -1,12 +1,15 @@
 from django.contrib.auth.hashers import make_password
 from django.contrib.gis.geos import Point
-from rest_framework.test import APITestCase, APIRequestFactory, force_authenticate
+from rest_framework.test import APITestCase, APIRequestFactory, force_authenticate, APIClient
 from rest_framework_jwt.settings import api_settings
 
+from TooPath3.constants import DEFAULT_ERROR_MESSAGES
 from TooPath3.locations.views import *
-from TooPath3.models import Device, CustomUser
+from TooPath3.models import Device, CustomUser, TrackLocation
 
 # DATA constants
+from TooPath3.users.utils import generate_token_for_testing
+
 VALID_DATA_LOCATION = {
     'latitude': 40.0,
     'longitude': 2.0
@@ -156,3 +159,93 @@ class PutActualLocation(APITestCase):
         force_authenticate(request, user=self.user, token=self.token)
         response = DeviceActualLocation.as_view()(request, pk=1)
         self.assertEqual(response.data, {'non_field_errors': ['Enter a valid longitude.']})
+
+
+def _create_user_with_username(username):
+    return CustomUser.objects.create(username=username, password=make_password('password'))
+
+
+def _create_device_with_owner(owner):
+    return Device.objects.create(name='device_test', device_type='ad', device_privacy='pr', owner=owner)
+
+
+class PostTrackLocationCase(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = _create_user_with_username('user_test')
+        self.token = generate_token_for_testing(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
+
+    def test_return_404_when_device_not_exists(self):
+        device = _create_device_with_owner(self.user)
+        track = self._create_track(device)
+        response = self.client.post('/devices/100/tracks/' + str(track.tid) + '/trackLocations/', {})
+        self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_return_404_when_track_not_exists(self):
+        device = _create_device_with_owner(self.user)
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/100/trackLocations/', {})
+        self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_return_401_status_when_user_is_not_authenticated(self):
+        self.client.credentials(HTTP_AUTHORIZATION='')
+        response = self.client.post('/devices/100/tracks/100/trackLocations/', {})
+        self.assertEqual(HTTP_401_UNAUTHORIZED, response.status_code)
+
+    def test_return_403_status_when_user_has_not_permissions(self):
+        owner = _create_user_with_username('owner')
+        device = _create_device_with_owner(owner)
+        track = self._create_track(device)
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
+                                    {})
+        self.assertEqual(HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_return_201_status_when_track_location_created(self):
+        device = _create_device_with_owner(self.user)
+        track = self._create_track(device)
+        json_body = {'point': {'type': 'Point', 'coordinates': [90, 90]}}
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
+                                    json_body)
+        self.assertEqual(HTTP_201_CREATED, response.status_code)
+
+    def test_instance_exists_status_when_track_location_created(self):
+        device = _create_device_with_owner(self.user)
+        track = self._create_track(device)
+        json_body = {'point': {'type': 'Point', 'coordinates': [90, 90]}}
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
+                                    json_body)
+        track_location = self._get_track_location_by_id(response.data['id'])
+        self.assertIsNotNone(track_location)
+
+    def test_return_json_with_instance_info_status_when_track_location_created(self):
+        device = _create_device_with_owner(self.user)
+        track = self._create_track(device)
+        json_body = {'point': {'type': 'Point', 'coordinates': [90, 90]}}
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
+                                    json_body)
+        expected_json = TrackLocationSerializer(self._get_track_location_by_id(response.data['id'])).data
+        self.assertEqual(expected_json, response.data)
+
+    def test_return_invalid_latitude_error_when_body_has_invalid_latitude(self):
+        device = _create_device_with_owner(self.user)
+        track = self._create_track(device)
+        json_body = {'point': {'type': 'Point', 'coordinates': [91, 90]}}
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
+                                    json_body)
+        expected_json = {'non_field_errors': [DEFAULT_ERROR_MESSAGES['invalid_latitude']]}
+        self.assertEqual(expected_json, response.data)
+
+    def test_return_invalid_longitude_error_when_body_has_invalid_longitude(self):
+        device = _create_device_with_owner(self.user)
+        track = self._create_track(device)
+        json_body = {'point': {'type': 'Point', 'coordinates': [1, 181]}}
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
+                                    json_body)
+        expected_json = {'non_field_errors': [DEFAULT_ERROR_MESSAGES['invalid_longitude']]}
+        self.assertEqual(expected_json, response.data)
+
+    def _create_track(self, device):
+        return Track.objects.create(name='track_test', device=device)
+
+    def _get_track_location_by_id(self, id):
+        return TrackLocation.objects.get(pk=id)

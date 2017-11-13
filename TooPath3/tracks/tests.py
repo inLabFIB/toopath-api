@@ -41,9 +41,9 @@ class PostTracksCase(APITestCase):
 
     def test_instance_exists_when_track_is_created(self):
         device = Device.objects.create(name='device_test', device_type='ad', device_privacy='pr', owner=self.user)
-        self.client.post('/devices/' + str(device.did) + '/tracks/',
-                         {"name": "test_track", "description": "this is a description"})
-        track = Track.objects.get(pk=1)
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/',
+                                    {"name": "test_track", "description": "this is a description"})
+        track = Track.objects.get(pk=response.data['tid'])
         self.assertIsNotNone(track)
 
     def test_return_json_with_instance_info_when_track_is_created(self):

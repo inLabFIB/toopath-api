@@ -7,8 +7,8 @@ from rest_framework.views import APIView
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from TooPath3.devices.permissions import IsOwnerOrReadOnly
-from TooPath3.locations.serializers import CoordinatesSerializer, ActualLocationSerializer
-from TooPath3.models import ActualLocation
+from TooPath3.locations.serializers import CoordinatesSerializer, ActualLocationSerializer, TrackLocationSerializer
+from TooPath3.models import ActualLocation, Track, Device
 
 
 class DeviceActualLocation(APIView):
@@ -41,4 +41,24 @@ class DeviceActualLocation(APIView):
             if serializer.is_valid():
                 serializer.save()
                 return Response(status=HTTP_200_OK)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+
+class TrackLocationList(APIView):
+    authentication_classes = (JSONWebTokenAuthentication, SessionAuthentication, BasicAuthentication,)
+    permission_classes = (IsAuthenticated, IsOwnerOrReadOnly,)
+
+    def get_object(self, pk):
+        obj = get_object_or_404(Track, pk=pk)
+        self.check_object_permissions(self.request, obj=obj)
+        return obj
+
+    def post(self, request, d_pk, tl_pk):
+        get_object_or_404(Device, pk=d_pk)
+        track = self.get_object(tl_pk)
+        request.data['track'] = track.tid
+        serializer = TrackLocationSerializer(data=request.data)
+        if serializer.is_valid():
+            track_location_created = serializer.save()
+            return Response(TrackLocationSerializer(track_location_created).data, status=HTTP_201_CREATED)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
