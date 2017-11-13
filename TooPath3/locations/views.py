@@ -59,5 +59,6 @@ class TrackLocationList(APIView):
         request.data['track'] = track.tid
         serializer = TrackLocationSerializer(data=request.data)
         if serializer.is_valid():
-            return Response(status=HTTP_201_CREATED)
+            track_location_created = serializer.save()
+            return Response(TrackLocationSerializer(track_location_created).data, status=HTTP_201_CREATED)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
