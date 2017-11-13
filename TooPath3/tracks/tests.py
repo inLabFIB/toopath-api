@@ -3,7 +3,7 @@ from rest_framework.status import *
 from rest_framework.test import APITestCase, APIClient
 
 from TooPath3.models import CustomUser, Device, Track
-from TooPath3.utils import generate_token_for_testing, create_user_with_username, create_device_with_owner
+from TooPath3.utils import generate_token_for_testing, create_user_with_username, create_device_with_owner, create_track_with_device
 
 
 class PostTracksCase(APITestCase):
@@ -54,18 +54,38 @@ class PostTracksCase(APITestCase):
                          "device": device.did}
         self.assertEqual(expected_json, response.data)
 
-    class PutTracksCase(APITestCase):
-        def setUp(self):
-            self.client = APIClient()
-            self.user = create_user_with_username('user_test')
-            self.token = generate_token_for_testing(self.user)
-            self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
-        def test_return_404_status_when_device_not_exists(self):
-            response = self.client.post('/devices/100/tracks/1/', {})
-            self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
+class PutTracksCase(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = create_user_with_username('user_test')
+        self.token = generate_token_for_testing(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
-        def test_return_404_status_when_track_not_exists(self):
-            device = create_device_with_owner(self.user)
-            response = self.client.post('/devices/' + str(device.did) + '/tracks/1/', {})
-            self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
+    def test_return_404_status_when_device_not_exists(self):
+        response = self.client.post('/devices/100/tracks/1/', {})
+        self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_return_404_status_when_track_not_exists(self):
+        device = create_device_with_owner(self.user)
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/100/', {})
+        self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_return_403_status_when_user_has_not_permissions(self):
+        owner = create_user_with_username('owner')
+        device = create_device_with_owner(owner)
+        track = create_track_with_device(device)
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/', {})
+        self.assertEqual(HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_return_401_status_when_user_is_not_authenticated(self):
+        self.client.credentials(HTTP_AUTHORIZATION='')
+        response = self.client.post('/devices/1/tracks/1/', {})
+        self.assertEqual(HTTP_401_UNAUTHORIZED, response.status_code)
+
+    def test_return_400_status_when_json_body_is_invalid(self):
+        device = create_device_with_owner(self.user)
+        track = create_track_with_device(device)
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/',
+                                    {"desc": "this attribute does not exist"})
+        self.assertEqual(HTTP_400_BAD_REQUEST, response.status_code)

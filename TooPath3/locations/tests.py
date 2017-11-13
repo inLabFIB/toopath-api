@@ -7,7 +7,7 @@ from TooPath3.constants import DEFAULT_ERROR_MESSAGES
 from TooPath3.locations.views import *
 from TooPath3.models import Device, CustomUser, TrackLocation
 from TooPath3.utils import generate_token_for_testing, get_latest_id_inserted, create_user_with_username, \
-    create_device_with_owner, create_track
+    create_device_with_owner, create_track_with_device
 
 VALID_DATA_LOCATION = {
     'latitude': 40.0,
@@ -169,7 +169,7 @@ class PostTrackLocationCase(APITestCase):
 
     def test_return_404_when_device_not_exists(self):
         device = create_device_with_owner(self.user)
-        track = create_track(device)
+        track = create_track_with_device(device)
         response = self.client.post('/devices/100/tracks/' + str(track.tid) + '/trackLocations/', {})
         self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
 
@@ -186,14 +186,14 @@ class PostTrackLocationCase(APITestCase):
     def test_return_403_status_when_user_has_not_permissions(self):
         owner = create_user_with_username('owner')
         device = create_device_with_owner(owner)
-        track = create_track(device)
+        track = create_track_with_device(device)
         response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
                                     {})
         self.assertEqual(HTTP_403_FORBIDDEN, response.status_code)
 
     def test_return_201_status_when_track_location_created(self):
         device = create_device_with_owner(self.user)
-        track = create_track(device)
+        track = create_track_with_device(device)
         json_body = {'point': {'type': 'Point', 'coordinates': [90, 90]}}
         response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
                                     json_body)
@@ -201,7 +201,7 @@ class PostTrackLocationCase(APITestCase):
 
     def test_instance_exists_status_when_track_location_created(self):
         device = create_device_with_owner(self.user)
-        track = create_track(device)
+        track = create_track_with_device(device)
         json_body = {'point': {'type': 'Point', 'coordinates': [90, 90]}}
         self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
                          json_body)
@@ -210,7 +210,7 @@ class PostTrackLocationCase(APITestCase):
 
     def test_return_json_with_instance_info_status_when_track_location_created(self):
         device = create_device_with_owner(self.user)
-        track = create_track(device)
+        track = create_track_with_device(device)
         json_body = {'point': {'type': 'Point', 'coordinates': [90, 90]}}
         response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
                                     json_body)
@@ -220,7 +220,7 @@ class PostTrackLocationCase(APITestCase):
 
     def test_return_invalid_latitude_error_when_body_has_invalid_latitude(self):
         device = create_device_with_owner(self.user)
-        track = create_track(device)
+        track = create_track_with_device(device)
         json_body = {'point': {'type': 'Point', 'coordinates': [91, 90]}}
         response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
                                     json_body)
@@ -229,7 +229,7 @@ class PostTrackLocationCase(APITestCase):
 
     def test_return_invalid_longitude_error_when_body_has_invalid_longitude(self):
         device = create_device_with_owner(self.user)
-        track = create_track(device)
+        track = create_track_with_device(device)
         json_body = {'point': {'type': 'Point', 'coordinates': [1, 181]}}
         response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
                                     json_body)

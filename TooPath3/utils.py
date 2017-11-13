@@ -28,5 +28,5 @@ def create_device_with_owner(owner):
     return Device.objects.create(name='device_test', device_type='ad', device_privacy='pr', owner=owner)
 
 
-def create_track(device):
+def create_track_with_device(device):
     return Track.objects.create(name='track_test', device=device)
