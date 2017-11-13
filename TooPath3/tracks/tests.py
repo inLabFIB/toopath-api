@@ -2,8 +2,11 @@ from django.contrib.auth.hashers import make_password
 from rest_framework.status import *
 from rest_framework.test import APITestCase, APIClient
 
+from TooPath3.constants import DEFAULT_ERROR_MESSAGES
 from TooPath3.models import CustomUser, Device, Track
-from TooPath3.utils import generate_token_for_testing, create_user_with_username, create_device_with_owner, create_track_with_device
+from TooPath3.tracks.serializers import TrackSerializer
+from TooPath3.utils import generate_token_for_testing, create_user_with_username, create_device_with_owner, \
+    create_track_with_device, get_latest_id_inserted
 
 
 class PostTracksCase(APITestCase):
@@ -43,7 +46,7 @@ class PostTracksCase(APITestCase):
         device = create_device_with_owner(self.user)
         response = self.client.post('/devices/' + str(device.did) + '/tracks/',
                                     {"name": "test_track", "description": "this is a description"})
-        track = Track.objects.get(pk=response.data['tid'])
+        track = Track.objects.get(pk=get_latest_id_inserted(Track))
         self.assertIsNotNone(track)
 
     def test_return_json_with_instance_info_when_track_is_created(self):
@@ -63,29 +66,58 @@ class PutTracksCase(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
     def test_return_404_status_when_device_not_exists(self):
-        response = self.client.post('/devices/100/tracks/1/', {})
+        response = self.client.patch('/devices/100/tracks/1/', {})
         self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
 
     def test_return_404_status_when_track_not_exists(self):
         device = create_device_with_owner(self.user)
-        response = self.client.post('/devices/' + str(device.did) + '/tracks/100/', {})
+        response = self.client.patch('/devices/' + str(device.did) + '/tracks/100/', {})
         self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
 
     def test_return_403_status_when_user_has_not_permissions(self):
         owner = create_user_with_username('owner')
         device = create_device_with_owner(owner)
         track = create_track_with_device(device)
-        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/', {})
+        response = self.client.patch('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/', {})
         self.assertEqual(HTTP_403_FORBIDDEN, response.status_code)
 
     def test_return_401_status_when_user_is_not_authenticated(self):
         self.client.credentials(HTTP_AUTHORIZATION='')
-        response = self.client.post('/devices/1/tracks/1/', {})
+        response = self.client.patch('/devices/1/tracks/1/', {})
         self.assertEqual(HTTP_401_UNAUTHORIZED, response.status_code)
 
     def test_return_400_status_when_json_body_is_invalid(self):
         device = create_device_with_owner(self.user)
         track = create_track_with_device(device)
-        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/',
-                                    {"desc": "this attribute does not exist"})
+        response = self.client.patch('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/',
+                                     {"desc": "this attribute does not exist"})
         self.assertEqual(HTTP_400_BAD_REQUEST, response.status_code)
+
+    def test_return_200_status_when_track_updated(self):
+        device = create_device_with_owner(self.user)
+        track = create_track_with_device(device)
+        response = self.client.patch('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/',
+                                     {"description": "new description"})
+        self.assertEqual(HTTP_200_OK, response.status_code)
+
+    def test_instance_updated_status_when_track_updated(self):
+        device = create_device_with_owner(self.user)
+        track = create_track_with_device(device)
+        self.client.patch('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/', {"name": "new_name"})
+        track_updated = Track.objects.get(pk=get_latest_id_inserted(Track))
+        self.assertEqual("new_name", track_updated.name)
+
+    def test_return_json_with_instance_info_when_track_is_updated(self):
+        device = create_device_with_owner(self.user)
+        track = create_track_with_device(device)
+        response = self.client.patch('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/',
+                                     {"name": "new_name"})
+        track_updated = Track.objects.get(pk=get_latest_id_inserted(Track))
+        self.assertEqual(TrackSerializer(track_updated).data, response.data)
+
+    def test_return_method_error_message_when_try_to_change_instance_representation(self):
+        device = create_device_with_owner(self.user)
+        track = create_track_with_device(device)
+        response = self.client.patch('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/',
+                                     {"device": device.did})
+        self.assertEqual({'non_field_errors': [DEFAULT_ERROR_MESSAGES['invalid_patch']]}, response.data)

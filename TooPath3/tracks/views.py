@@ -40,10 +40,11 @@ class TrackDetail(APIView):
         self.check_object_permissions(self.request, obj=obj)
         return obj
 
-    def post(self, request, d_pk, t_pk):
+    def patch(self, request, d_pk, t_pk):
         self.get_object(d_pk, Device)
         track = self.get_object(t_pk, Track)
-        serializer = TrackSerializer(track, request.data)
+        serializer = TrackSerializer(track, data=request.data, partial=True)
         if serializer.is_valid():
-            return Response()
+            track_partial_updated = serializer.save()
+            return Response(TrackSerializer(track_partial_updated).data, status=HTTP_200_OK)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
