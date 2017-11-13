@@ -52,3 +52,8 @@ class PostTracksCase(APITestCase):
                                     {"name": "test_track", "description": "this is a description"})
         self.assertEqual({'tid': response.data['tid'], 'name': 'test_track', 'description': "this is a description",
                           "device": device.did}, response.data)
+
+
+class PutTracksCase(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
