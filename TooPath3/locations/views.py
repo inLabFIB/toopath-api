@@ -48,14 +48,14 @@ class TrackLocationList(APIView):
     authentication_classes = (JSONWebTokenAuthentication, SessionAuthentication, BasicAuthentication,)
     permission_classes = (IsAuthenticated, IsOwnerOrReadOnly,)
 
-    def get_object(self, pk):
-        obj = get_object_or_404(Track, pk=pk)
+    def get_object(self, pk, model_class):
+        obj = get_object_or_404(model_class, pk=pk)
         self.check_object_permissions(self.request, obj=obj)
         return obj
 
-    def post(self, request, d_pk, tl_pk):
-        get_object_or_404(Device, pk=d_pk)
-        track = self.get_object(tl_pk)
+    def post(self, request, d_pk, t_pk):
+        self.get_object(d_pk, Device)
+        track = self.get_object(t_pk, Track)
         request.data['track'] = track.tid
         serializer = TrackLocationSerializer(data=request.data)
         if serializer.is_valid():

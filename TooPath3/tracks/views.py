@@ -11,7 +11,7 @@ from TooPath3.models import Device
 from TooPath3.tracks.serializers import TrackSerializer
 
 
-class TracksList(APIView):
+class TrackList(APIView):
     authentication_classes = (JSONWebTokenAuthentication, SessionAuthentication, BasicAuthentication,)
     permission_classes = (IsAuthenticated, IsOwnerOrReadOnly,)
 
@@ -29,3 +29,13 @@ class TracksList(APIView):
             track_json = TrackSerializer(track).data
             return Response(track_json, status=HTTP_201_CREATED)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+
+class TrackDetail(APIView):
+    def get_object(self, pk, model_class):
+        obj = get_object_or_404(model_class, pk=pk)
+        self.check_object_permissions(self.request, obj=obj)
+        return obj
+
+    def post(self, request, d_pk, t_pk):
+        self.get_object(d_pk, Device)

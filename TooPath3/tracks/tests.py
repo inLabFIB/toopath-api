@@ -3,7 +3,7 @@ from rest_framework.status import *
 from rest_framework.test import APITestCase, APIClient
 
 from TooPath3.models import CustomUser, Device, Track
-from TooPath3.utils import generate_token_for_testing
+from TooPath3.utils import generate_token_for_testing, create_user_with_username
 
 
 class PostTracksCase(APITestCase):
@@ -57,3 +57,10 @@ class PostTracksCase(APITestCase):
 class PutTracksCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
+        self.user = create_user_with_username('user_test')
+        self.token = generate_token_for_testing(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
+
+    def test_return_404_status_when_device_not_exists(self):
+        response = self.client.post('/devices/100/tracks/1/', {})
+        self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
