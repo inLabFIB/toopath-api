@@ -48,3 +48,12 @@ class TrackDetail(APIView):
             track_partial_updated = serializer.save()
             return Response(TrackSerializer(track_partial_updated).data, status=HTTP_200_OK)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+    def put(self, request, d_pk, t_pk):
+        self.get_object(d_pk, Device)
+        track = self.get_object(t_pk, Track)
+        serializer = TrackSerializer(track, data=request.data)
+        if serializer.is_valid():
+            track_partial_updated = serializer.save()
+            return Response(TrackSerializer(track_partial_updated).data, status=HTTP_200_OK)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
