@@ -74,11 +74,7 @@ class Location(models.Model):
 
 
 class ActualLocation(Location):
-    device = models.OneToOneField(
-        Device,
-        on_delete=models.CASCADE,
-        primary_key=True
-    )
+    device = models.OneToOneField(Device, on_delete=models.CASCADE, primary_key=True)
 
     class Meta(Location.Meta):
         db_table = 'actual_locations'
