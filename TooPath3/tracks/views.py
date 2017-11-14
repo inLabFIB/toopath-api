@@ -40,6 +40,10 @@ class TrackDetail(APIView):
         self.check_object_permissions(self.request, obj=obj)
         return obj
 
+    def get(self, request, d_pk, t_pk):
+        self.get_object(d_pk, Device)
+        track = self.get_object(t_pk, Track)
+
     def patch(self, request, d_pk, t_pk):
         self.get_object(d_pk, Device)
         track = self.get_object(t_pk, Track)

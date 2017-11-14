@@ -8,6 +8,23 @@ from TooPath3.utils import generate_token_for_testing, create_user_with_username
     create_track_with_device, get_latest_id_inserted
 
 
+class GetTrackCase(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = create_user_with_username('user_test')
+        self.token = generate_token_for_testing(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
+
+    def test_return_404_status_when_device_not_exists(self):
+        response = self.client.get('/devices/100/tracks/1/', {})
+        self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_return_404_status_when_track_not_exists(self):
+        device = create_device_with_owner(self.user)
+        response = self.client.get('/devices/' + str(device.did) + '/tracks/100/', {})
+        self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
+
+
 class PostTracksCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
@@ -43,7 +60,7 @@ class PostTracksCase(APITestCase):
 
     def test_instance_exists_when_track_is_created(self):
         device = create_device_with_owner(self.user)
-        response = self.client.post('/devices/' + str(device.did) + '/tracks/',
+        self.client.post('/devices/' + str(device.did) + '/tracks/',
                                     {"name": "test_track", "description": "this is a description"})
         track = Track.objects.get(pk=get_latest_id_inserted(Track))
         self.assertIsNotNone(track)
@@ -57,7 +74,7 @@ class PostTracksCase(APITestCase):
         self.assertEqual(expected_json, response.data)
 
 
-class PatchTracksCase(APITestCase):
+class PatchTrackCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = create_user_with_username('user_test')
@@ -122,7 +139,7 @@ class PatchTracksCase(APITestCase):
         self.assertEqual({'non_field_errors': [DEFAULT_ERROR_MESSAGES['invalid_patch']]}, response.data)
 
 
-class PutTracksCase(APITestCase):
+class PutTrackCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = create_user_with_username('user_test')
@@ -168,7 +185,7 @@ class PutTracksCase(APITestCase):
         device = create_device_with_owner(self.user)
         track = create_track_with_device(device)
         self.client.put('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/',
-                          {"name": "new_name", "device": device.did})
+                        {"name": "new_name", "device": device.did})
         track_updated = Track.objects.get(pk=get_latest_id_inserted(Track))
         self.assertEqual("new_name", track_updated.name)
 
@@ -176,6 +193,6 @@ class PutTracksCase(APITestCase):
         device = create_device_with_owner(self.user)
         track = create_track_with_device(device)
         response = self.client.put('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/',
-                                     {"name": "new_name", "device": device.did})
+                                   {"name": "new_name", "device": device.did})
         track_updated = Track.objects.get(pk=get_latest_id_inserted(Track))
         self.assertEqual(TrackSerializer(track_updated).data, response.data)
