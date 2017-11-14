@@ -43,6 +43,8 @@ class TrackDetail(APIView):
     def get(self, request, d_pk, t_pk):
         self.get_object(d_pk, Device)
         track = self.get_object(t_pk, Track)
+        serializer = TrackSerializer(track)
+        return Response(serializer.data, status=HTTP_200_OK)
 
     def patch(self, request, d_pk, t_pk):
         self.get_object(d_pk, Device)

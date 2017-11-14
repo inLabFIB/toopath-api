@@ -1,7 +1,8 @@
 from django.contrib.auth.hashers import make_password
+from django.contrib.gis.geos import Point
 from rest_framework_jwt.settings import api_settings
 
-from TooPath3.models import CustomUser, Device, Track
+from TooPath3.models import CustomUser, Device, Track, TrackLocation
 
 
 def get_jwt_secret(user):
@@ -30,3 +31,14 @@ def create_device_with_owner(owner):
 
 def create_track_with_device(device):
     return Track.objects.create(name='track_test', device=device)
+
+
+def create_track_location_with_track(track):
+    TrackLocation.objects.create(point=Point(44, 67), track=track)
+
+
+def create_various_track_locations_with_track(track):
+    count = 0
+    while count < 5:
+        create_track_location_with_track(track)
+        count += 1

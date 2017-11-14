@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from rest_framework.status import *
 from rest_framework.test import APITestCase, APIClient
 
@@ -5,7 +7,7 @@ from TooPath3.constants import DEFAULT_ERROR_MESSAGES
 from TooPath3.models import Track
 from TooPath3.tracks.serializers import TrackSerializer
 from TooPath3.utils import generate_token_for_testing, create_user_with_username, create_device_with_owner, \
-    create_track_with_device, get_latest_id_inserted
+    create_track_with_device, get_latest_id_inserted, create_various_track_locations_with_track
 
 
 class GetTrackCase(APITestCase):
@@ -16,13 +18,33 @@ class GetTrackCase(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
     def test_return_404_status_when_device_not_exists(self):
-        response = self.client.get('/devices/100/tracks/1/', {})
+        response = self.client.get('/devices/100/tracks/1/')
         self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
 
     def test_return_404_status_when_track_not_exists(self):
         device = create_device_with_owner(self.user)
-        response = self.client.get('/devices/' + str(device.did) + '/tracks/100/', {})
+        response = self.client.get('/devices/' + str(device.did) + '/tracks/100/')
         self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_return_401_status_when_user_is_not_authenticated(self):
+        self.client.credentials(HTTP_AUTHORIZATION='')
+        response = self.client.get('/devices/1/tracks/1/')
+        self.assertEqual(HTTP_401_UNAUTHORIZED, response.status_code)
+
+    def test_return_200_status_when_get_track_is_done(self):
+        device = create_device_with_owner(self.user)
+        track = create_track_with_device(device)
+        create_various_track_locations_with_track(track)
+        response = self.client.get('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/')
+        self.assertEqual(HTTP_200_OK, response.status_code)
+
+    def test_return_json_with_track_info_when_get_track_is_done(self):
+        device = create_device_with_owner(self.user)
+        track = create_track_with_device(device)
+        create_various_track_locations_with_track(track)
+        response = self.client.get('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/')
+        track_get = Track.objects.get(pk=get_latest_id_inserted(Track))
+        self.assertEqual(TrackSerializer(track).data, response.data)
 
 
 class PostTracksCase(APITestCase):
@@ -61,7 +83,7 @@ class PostTracksCase(APITestCase):
     def test_instance_exists_when_track_is_created(self):
         device = create_device_with_owner(self.user)
         self.client.post('/devices/' + str(device.did) + '/tracks/',
-                                    {"name": "test_track", "description": "this is a description"})
+                         {"name": "test_track", "description": "this is a description"})
         track = Track.objects.get(pk=get_latest_id_inserted(Track))
         self.assertIsNotNone(track)
 
@@ -69,9 +91,8 @@ class PostTracksCase(APITestCase):
         device = create_device_with_owner(self.user)
         response = self.client.post('/devices/' + str(device.did) + '/tracks/',
                                     {"name": "test_track", "description": "this is a description"})
-        expected_json = {'tid': response.data['tid'], 'name': 'test_track', 'description': "this is a description",
-                         "device": device.did}
-        self.assertEqual(expected_json, response.data)
+        track_created = Track.objects.get(pk=get_latest_id_inserted(Track))
+        self.assertEqual(TrackSerializer(track_created).data, response.data)
 
 
 class PatchTrackCase(APITestCase):
