@@ -64,6 +64,8 @@ class GetTracksCase(APITestCase):
         device = create_device_with_owner(self.user)
         track = create_track_with_device(device)
         create_various_track_locations_with_track(track)
+        track2 = create_track_with_device(device)
+        create_various_track_locations_with_track(track2)
         response = self.client.get('/devices/' + str(device.did) + '/tracks/')
         self.assertEqual(HTTP_200_OK, response.status_code)
 
@@ -71,8 +73,11 @@ class GetTracksCase(APITestCase):
         device = create_device_with_owner(self.user)
         track = create_track_with_device(device)
         create_various_track_locations_with_track(track)
+        track2 = create_track_with_device(device)
+        create_various_track_locations_with_track(track2)
         response = self.client.get('/devices/' + str(device.did) + '/tracks/')
-        self.assertEqual(TrackSerializer(track).data, response.data)
+        tracks = Track.objects.filter(device=device)
+        self.assertEqual(TrackSerializer(tracks, many=True).data, response.data)
 
 
 class PostTracksCase(APITestCase):
