@@ -20,8 +20,14 @@ class TrackList(APIView):
         self.check_object_permissions(self.request, obj=obj)
         return obj
 
-    def post(self, request, pk):
-        device = self.get_object(pk)
+    def get(self, request, d_pk):
+        device = self.get_object(d_pk)
+        tracks = Track.objects.filter(device=device)
+        serializer = TrackSerializer(tracks, many=True)
+        return Response(serializer.data, status=HTTP_200_OK)
+
+    def post(self, request, d_pk):
+        device = self.get_object(d_pk)
         request.data['device'] = device.did
         serializer = TrackSerializer(data=request.data)
         if serializer.is_valid():

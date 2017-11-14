@@ -9,7 +9,7 @@ urlpatterns = [
     url(r'^devices/(?P<d_pk>[0-9]+)/tracks/(?P<t_pk>[0-9]+)/trackLocations/$',
         locations_views.TrackLocationList.as_view()),
     url(r'^devices/(?P<d_pk>[0-9]+)/tracks/(?P<t_pk>[0-9]+)/$', tracks_views.TrackDetail.as_view()),
-    url(r'^devices/(?P<pk>[0-9]+)/tracks/$', tracks_views.TrackList.as_view()),
+    url(r'^devices/(?P<d_pk>[0-9]+)/tracks/$', tracks_views.TrackList.as_view()),
     url(r'^devices/(?P<pk>[0-9]+)/actualLocation/$', locations_views.DeviceActualLocation.as_view()),
     url(r'^devices/(?P<pk>[0-9]+)/$', devices_views.DeviceDetail.as_view()),
     url(r'^devices/$', devices_views.DevicesDetail.as_view()),
