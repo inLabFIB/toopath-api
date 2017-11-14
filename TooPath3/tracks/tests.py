@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from rest_framework.status import *
 from rest_framework.test import APITestCase, APIClient
 
@@ -43,8 +41,43 @@ class GetTrackCase(APITestCase):
         track = create_track_with_device(device)
         create_various_track_locations_with_track(track)
         response = self.client.get('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/')
-        track_get = Track.objects.get(pk=get_latest_id_inserted(Track))
         self.assertEqual(TrackSerializer(track).data, response.data)
+
+
+class GetTracksCase(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = create_user_with_username('user_test')
+        self.token = generate_token_for_testing(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
+
+    def test_return_404_status_when_device_not_exists(self):
+        response = self.client.get('/devices/100/tracks/')
+        self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_return_401_status_when_user_is_not_authenticated(self):
+        self.client.credentials(HTTP_AUTHORIZATION='')
+        response = self.client.get('/devices/1/tracks/')
+        self.assertEqual(HTTP_401_UNAUTHORIZED, response.status_code)
+
+    def test_return_200_status_when_get_tracks_is_done(self):
+        device = create_device_with_owner(self.user)
+        track = create_track_with_device(device)
+        create_various_track_locations_with_track(track)
+        track2 = create_track_with_device(device)
+        create_various_track_locations_with_track(track2)
+        response = self.client.get('/devices/' + str(device.did) + '/tracks/')
+        self.assertEqual(HTTP_200_OK, response.status_code)
+
+    def test_return_json_with_tracks_info_when_get_track_is_done(self):
+        device = create_device_with_owner(self.user)
+        track = create_track_with_device(device)
+        create_various_track_locations_with_track(track)
+        track2 = create_track_with_device(device)
+        create_various_track_locations_with_track(track2)
+        response = self.client.get('/devices/' + str(device.did) + '/tracks/')
+        tracks = Track.objects.filter(device=device)
+        self.assertEqual(TrackSerializer(tracks, many=True).data, response.data)
 
 
 class PostTracksCase(APITestCase):
