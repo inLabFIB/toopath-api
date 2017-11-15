@@ -14,10 +14,8 @@ class TrackSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         if self.partial is True:
-            if 'device' in data:
+            if 'device' in data or 'pk' in data or 'tid' in data:
                 raise serializers.ValidationError(DEFAULT_ERROR_MESSAGES['invalid_patch'])
-            elif 'description' in data or 'name' in data:
-                return data
-            else:
+            if bool(data) is False:
                 raise serializers.ValidationError(DEFAULT_ERROR_MESSAGES['patch_track_fields_required'])
         return data

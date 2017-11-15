@@ -21,13 +21,20 @@ class DeviceDetail(APIView):
         self.check_object_permissions(self.request, obj=obj)
         return obj
 
-    def get(self, request, pk):
-        device = self.get_object(pk)
+    def get(self, request, d_pk):
+        device = self.get_object(d_pk)
         serializer = DeviceSerializer(device)
         return Response(serializer.data, status=HTTP_200_OK)
 
-    def put(self, request, pk):
-        device = self.get_object(pk)
+    def patch(self, request, d_pk):
+        self.get_object(d_pk)
+        serializer = DeviceSerializer(data=request.data, partial=True)
+        if serializer.is_valid():
+            return Response(status=HTTP_200_OK)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+    def put(self, request, d_pk):
+        device = self.get_object(d_pk)
         data = JSONParser().parse(request)
         if 'name' not in data:
             data['name'] = device.name
@@ -38,7 +45,7 @@ class DeviceDetail(APIView):
         return Response(serializer.errors, HTTP_400_BAD_REQUEST)
 
 
-class DevicesDetail(APIView):
+class DeviceList(APIView):
     authentication_classes = (JSONWebTokenAuthentication, SessionAuthentication, BasicAuthentication,)
     permission_classes = (IsAuthenticated, IsOwnerOrReadOnly,)
 
