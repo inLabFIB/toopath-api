@@ -7,8 +7,11 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
+        # Write permissions are only allowed to the self user.
+        if obj._meta.object_name == 'CustomUser':
+            return obj.id == request.user.id
+
+        # Write permissions are only allowed to the owner of the device.
         if hasattr(obj, 'device'):
             return obj.device.owner == request.user
-
-        # Write permissions are only allowed to the owner of the snippet.
         return obj.owner == request.user

@@ -7,6 +7,8 @@ from TooPath3.models import CustomUser
 from TooPath3.users.views import *
 
 # DATA CONSTANTS
+from TooPath3.utils import create_user_with_username, generate_token_for_testing
+
 VALID_DATA_USER = {
     "username": "test",
     "email": "test@test.com",
@@ -30,7 +32,35 @@ DATA_LOGIN_NO_USERNAME = {
     "password": "test"
 }
 
-UserModel = get_user_model()
+
+class GetUserCase(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = create_user_with_username('user_test')
+        self.token = generate_token_for_testing(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
+
+    def test_return_404_status_when_user_not_exists(self):
+        response = self.client.get(path='/users/100/')
+        self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_return_403_status_when_user_is_not_self(self):
+        new_user = create_user_with_username('user2')
+        response = self.client.get(path='/users/' + str(new_user.pk) + '/')
+        self.assertEqual(HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_return_401_status_when_user_is_not_authenticated(self):
+        self.client.credentials(HTTP_AUTHORIZATION='')
+        response = self.client.get(path='/users/1/')
+        self.assertEqual(HTTP_401_UNAUTHORIZED, response.status_code)
+
+    def test_return_200_status_when_get_user_is_done(self):
+        response = self.client.get(path='/users/' + str(self.user.pk) + '/')
+        self.assertEqual(HTTP_200_OK, response.status_code)
+
+    def test_return_json_with_user_info_status_when_get_user_is_done(self):
+        response = self.client.get(path='/users/' + str(self.user.pk) + '/')
+        self.assertEqual(PublicCustomUserSerializer(instance=self.user).data, response.data)
 
 
 class PostUsers(APITestCase):
