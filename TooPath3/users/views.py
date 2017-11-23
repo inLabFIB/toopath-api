@@ -11,7 +11,7 @@ from rest_framework_jwt.settings import api_settings
 
 from TooPath3.devices.permissions import IsOwnerOrReadOnly
 from TooPath3.models import CustomUser
-from TooPath3.users.serializers import CustomUserSerializer
+from TooPath3.users.serializers import CustomUserSerializer, PublicCustomUserSerializer
 
 
 class UserDetail(APIView):
@@ -25,7 +25,8 @@ class UserDetail(APIView):
 
     def get(self, request, u_pk):
         user = self.get_object(u_pk)
-        return Response(status=HTTP_200_OK)
+        serializer = PublicCustomUserSerializer(instance=user)
+        return Response(status=HTTP_200_OK, data=serializer.data)
 
 
 @api_view(['POST'])

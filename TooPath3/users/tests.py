@@ -54,6 +54,14 @@ class GetUserCase(APITestCase):
         response = self.client.get(path='/users/1/')
         self.assertEqual(HTTP_401_UNAUTHORIZED, response.status_code)
 
+    def test_return_200_status_when_get_user_is_done(self):
+        response = self.client.get(path='/users/' + str(self.user.pk) + '/')
+        self.assertEqual(HTTP_200_OK, response.status_code)
+
+    def test_return_json_with_user_info_status_when_get_user_is_done(self):
+        response = self.client.get(path='/users/' + str(self.user.pk) + '/')
+        self.assertEqual(PublicCustomUserSerializer(instance=self.user).data, response.data)
+
 
 class PostUsers(APITestCase):
     """
