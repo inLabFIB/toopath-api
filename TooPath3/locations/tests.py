@@ -6,7 +6,7 @@ from rest_framework_jwt.settings import api_settings
 from TooPath3.constants import DEFAULT_ERROR_MESSAGES
 from TooPath3.locations.views import *
 from TooPath3.models import Device, CustomUser, TrackLocation
-from TooPath3.utils import generate_token_for_testing, get_latest_id_inserted, create_user_with_username, \
+from TooPath3.utils import generate_token_for_testing, get_latest_id_inserted, create_user_with_email, \
     create_device_with_owner, create_track_with_device
 
 VALID_DATA_LOCATION = {
@@ -30,8 +30,10 @@ INVALID_LONGITUDE_DATA_LOCATION = {
 class GetActualLocation(APITestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
-        self.user = CustomUser.objects.create(username='test', password=make_password('password'))
-        self.user2 = CustomUser.objects.create(username='test2', password=make_password('password'))
+        self.user = CustomUser.objects.create(email='test@gmail.com', username='test',
+                                              password=make_password('password'))
+        self.user2 = CustomUser.objects.create(email='test2@gmail.com', username='test2',
+                                               password=make_password('password'))
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
         jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
         payload = jwt_payload_handler(self.user)
@@ -84,8 +86,10 @@ class PutActualLocation(APITestCase):
 
     def setUp(self):
         self.factory = APIRequestFactory()
-        self.user = CustomUser.objects.create(username='test', password=make_password('password'))
-        self.user2 = CustomUser.objects.create(username='test2', password=make_password('password'))
+        self.user = CustomUser.objects.create(email='test@gmail.com', username='test',
+                                              password=make_password('password'))
+        self.user2 = CustomUser.objects.create(email='test2@gmail.com', username='test2',
+                                               password=make_password('password'))
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
         jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
         payload = jwt_payload_handler(self.user)
@@ -163,7 +167,7 @@ class PutActualLocation(APITestCase):
 class PostTrackLocationCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = create_user_with_username('user_test')
+        self.user = create_user_with_email('user_test')
         self.token = generate_token_for_testing(self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
@@ -184,7 +188,7 @@ class PostTrackLocationCase(APITestCase):
         self.assertEqual(HTTP_401_UNAUTHORIZED, response.status_code)
 
     def test_return_403_status_when_user_has_not_permissions(self):
-        owner = create_user_with_username('owner')
+        owner = create_user_with_email('owner')
         device = create_device_with_owner(owner)
         track = create_track_with_device(device)
         response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',

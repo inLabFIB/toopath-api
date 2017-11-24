@@ -4,14 +4,14 @@ from rest_framework.test import APITestCase, APIClient
 from TooPath3.constants import DEFAULT_ERROR_MESSAGES
 from TooPath3.models import Track
 from TooPath3.tracks.serializers import TrackSerializer
-from TooPath3.utils import generate_token_for_testing, create_user_with_username, create_device_with_owner, \
+from TooPath3.utils import generate_token_for_testing, create_user_with_email, create_device_with_owner, \
     create_track_with_device, get_latest_id_inserted, create_various_track_locations_with_track
 
 
 class GetTrackCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = create_user_with_username('user_test')
+        self.user = create_user_with_email('user_test')
         self.token = generate_token_for_testing(self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
@@ -44,10 +44,10 @@ class GetTrackCase(APITestCase):
         self.assertEqual(TrackSerializer(track).data, response.data)
 
 
-class GetTracksCase(APITestCase):
+class GetTrackCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = create_user_with_username('user_test')
+        self.user = create_user_with_email('user_test')
         self.token = generate_token_for_testing(self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
@@ -56,7 +56,7 @@ class GetTracksCase(APITestCase):
         self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
 
     def test_return_403_status_when_user_has_not_permissions(self):
-        owner = create_user_with_username('owner')
+        owner = create_user_with_email('owner')
         device = create_device_with_owner(owner)
         response = self.client.get('/devices/' + str(device.did) + '/tracks/', {})
         self.assertEqual(HTTP_403_FORBIDDEN, response.status_code)
@@ -89,7 +89,7 @@ class GetTracksCase(APITestCase):
 class PostTracksCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = create_user_with_username('user_test')
+        self.user = create_user_with_email('user_test')
         self.token = generate_token_for_testing(self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
@@ -98,7 +98,7 @@ class PostTracksCase(APITestCase):
         self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
 
     def test_return_403_status_when_user_has_not_permissions(self):
-        owner = create_user_with_username('owner')
+        owner = create_user_with_email('owner')
         device = create_device_with_owner(owner)
         response = self.client.post('/devices/' + str(device.did) + '/tracks/', {})
         self.assertEqual(HTTP_403_FORBIDDEN, response.status_code)
@@ -137,7 +137,7 @@ class PostTracksCase(APITestCase):
 class PatchTrackCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = create_user_with_username('user_test')
+        self.user = create_user_with_email('user_test')
         self.token = generate_token_for_testing(self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
@@ -151,7 +151,7 @@ class PatchTrackCase(APITestCase):
         self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
 
     def test_return_403_status_when_user_has_not_permissions(self):
-        owner = create_user_with_username('owner')
+        owner = create_user_with_email('owner')
         device = create_device_with_owner(owner)
         track = create_track_with_device(device)
         response = self.client.patch('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/', {})
@@ -202,7 +202,7 @@ class PatchTrackCase(APITestCase):
 class PutTrackCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = create_user_with_username('user_test')
+        self.user = create_user_with_email('user_test')
         self.token = generate_token_for_testing(self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
@@ -216,7 +216,7 @@ class PutTrackCase(APITestCase):
         self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
 
     def test_return_403_status_when_user_has_not_permissions(self):
-        owner = create_user_with_username('owner')
+        owner = create_user_with_email('owner')
         device = create_device_with_owner(owner)
         track = create_track_with_device(device)
         response = self.client.put('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/', {})

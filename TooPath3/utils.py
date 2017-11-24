@@ -23,8 +23,8 @@ def get_latest_id_inserted(model_class):
 
 # Methods for Test Cases
 
-def create_user_with_username(username):
-    return CustomUser.objects.create(username=username, password=make_password('password'))
+def create_user_with_email(email):
+    return CustomUser.objects.create(email=email, username=email.split('@')[0])
 
 
 def create_device_with_owner(owner):

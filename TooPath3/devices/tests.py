@@ -9,7 +9,7 @@ from rest_framework_jwt.settings import api_settings
 from TooPath3.models import Device, CustomUser, ActualLocation
 
 # DATA CONSTANTS
-from TooPath3.utils import create_user_with_username, generate_token_for_testing, create_device_with_owner
+from TooPath3.utils import create_user_with_email, generate_token_for_testing, create_device_with_owner
 
 VALID_DATA_POST_DEVICE = {
     "name": "test",
@@ -60,7 +60,7 @@ class GetDevice(APITestCase):
 class PatchDevice(APITestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = create_user_with_username('user_test')
+        self.user = create_user_with_email('user_test')
         self.token = generate_token_for_testing(self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
@@ -74,7 +74,7 @@ class PatchDevice(APITestCase):
         self.assertEqual(HTTP_401_UNAUTHORIZED, response.status_code)
 
     def test_return_403_status_when_user_has_not_permissions(self):
-        owner = create_user_with_username('owner')
+        owner = create_user_with_email('owner')
         device = create_device_with_owner(owner)
         response = self.client.patch('/devices/' + str(device.did) + '/', {})
         self.assertEqual(HTTP_403_FORBIDDEN, response.status_code)
@@ -92,7 +92,8 @@ class PutDevice(APITestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.user = CustomUser.objects.create(username='test', password=make_password('password'))
+        self.user = CustomUser.objects.create(email='test@gmail.com', username='test',
+                                              password=make_password('password'))
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
         jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
         payload = jwt_payload_handler(self.user)
@@ -100,7 +101,8 @@ class PutDevice(APITestCase):
         Device.objects.create(did=1, name='car', ip_address='0.0.0.0', device_type='ad', device_privacy='pr',
                               port_number='8080', owner=self.user)
         # user2 creation
-        self.user2 = CustomUser.objects.create(username='test2', password=make_password('password'))
+        self.user2 = CustomUser.objects.create(email='test2@gmail.com', username='test2', password=make_password(
+            'password'))
         payload = jwt_payload_handler(self.user2)
         self.token2 = jwt_encode_handler(payload)
 
