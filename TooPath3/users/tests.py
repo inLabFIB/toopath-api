@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from rest_framework.test import APITestCase, APIRequestFactory, APIClient
 
+from TooPath3.constants import DEFAULT_ERROR_MESSAGES
 from TooPath3.models import CustomUser
 from TooPath3.users.views import *
 
@@ -102,7 +103,7 @@ class PatchUserCase(APITestCase):
         self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
 
     def test_return_403_status_when_user_is_not_self(self):
-        new_user = create_user_with_email('user2')
+        new_user = create_user_with_email('user2@gmail.com')
         response = self.client.patch(path='/users/' + str(new_user.pk) + '/', data={})
         self.assertEqual(HTTP_403_FORBIDDEN, response.status_code)
 
@@ -111,13 +112,27 @@ class PatchUserCase(APITestCase):
         response = self.client.patch(path='/users/1/', data={})
         self.assertEqual(HTTP_401_UNAUTHORIZED, response.status_code)
 
+    def test_return_400_status_when_json_body_is_invalid(self):
+        json_data = {'name': 'test', 'last_name': 'refactor'}
+        response = self.client.patch(path='/users/' + str(self.user.pk) + '/', data=json_data)
+        self.assertEqual(HTTP_400_BAD_REQUEST, response.status_code)
+
+    def test_return_error_message_status_when_try_to_modify_instance_representation(self):
+        json_data = {'email': 'newtest@gmail.com'}
+        response = self.client.patch(path='/users/' + str(self.user.pk) + '/', data=json_data)
+        expected_error = {'non_field_errors': [DEFAULT_ERROR_MESSAGES['invalid_patch']]}
+        self.assertEqual(expected_error, response.data)
+
     def test_return_200_status_when_user_is_patched(self):
-        response = self.client.get(path='/users/' + str(self.user.pk) + '/')
+        json_data = {'first_name': 'test', 'last_name': 'refactor'}
+        response = self.client.patch(path='/users/' + str(self.user.pk) + '/', data=json_data)
         self.assertEqual(HTTP_200_OK, response.status_code)
 
     def test_return_json_with_user_info_status_when_get_user_is_done(self):
-        response = self.client.get(path='/users/' + str(self.user.pk) + '/')
-        self.assertEqual(PublicCustomUserSerializer(instance=self.user).data, response.data)
+        json_data = {'first_name': 'test', 'last_name': 'refactor'}
+        response = self.client.patch(path='/users/' + str(self.user.pk) + '/', data=json_data)
+        user_updated = CustomUser.objects.get(pk=self.user.pk)
+        self.assertEqual(PublicCustomUserSerializer(instance=user_updated).data, response.data)
 
 
 class LoginTest(APITestCase):

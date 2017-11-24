@@ -44,7 +44,7 @@ class GetTrackCase(APITestCase):
         self.assertEqual(TrackSerializer(track).data, response.data)
 
 
-class GetTracksCase(APITestCase):
+class GetTrackCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = create_user_with_email('user_test')
