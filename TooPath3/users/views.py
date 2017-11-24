@@ -36,6 +36,14 @@ class UserDetail(APIView):
             return Response(data=PublicCustomUserSerializer(user_updated).data, status=HTTP_200_OK)
         return Response(data=serializer.errors, status=HTTP_400_BAD_REQUEST)
 
+    def put(self, request, u_pk):
+        user = self.get_object(u_pk)
+        serializer = CustomUserSerializer(instance=user, data=request.data)
+        if serializer.is_valid():
+            user_updated = serializer.save()
+            return Response(data=PublicCustomUserSerializer(user_updated).data, status=HTTP_200_OK)
+        return Response(data=serializer.errors, status=HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
 def new_user(request):
