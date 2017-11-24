@@ -6,10 +6,12 @@ from rest_framework.test import APITestCase, APIClient
 from rest_framework_jwt.serializers import jwt_decode_handler, jwt_get_username_from_payload
 from rest_framework_jwt.settings import api_settings
 
+from TooPath3.devices.serializers import DeviceSerializer
 from TooPath3.models import Device, CustomUser, ActualLocation
 
 # DATA CONSTANTS
-from TooPath3.utils import create_user_with_email, generate_token_for_testing, create_device_with_owner
+from TooPath3.utils import create_user_with_email, generate_token_for_testing, create_device_with_owner, \
+    create_various_devices_with_owner
 
 VALID_DATA_POST_DEVICE = {
     "name": "test",
@@ -130,11 +132,7 @@ class PutDevice(APITestCase):
         self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
 
 
-class PostDevices(APITestCase):
-    """
-    POST /devices
-    """
-
+class PostDevice(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = CustomUser.objects.create(username='test', password=make_password('password'))
@@ -181,3 +179,27 @@ class PostDevices(APITestCase):
         response = self.client.post('/devices/', VALID_DATA_POST_DEVICE)
         device = Device.objects.get(pk=response.data['did'])
         self.assertIsInstance(device.actuallocation, ActualLocation)
+
+
+class GetDevicesCase(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = create_user_with_email('test@gmail.com')
+        self.token = generate_token_for_testing(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
+
+    def test_return_200_when_get_devices_done(self):
+        create_various_devices_with_owner(self.user)
+        different_owner = create_user_with_email('new@gmai.l.com')
+        create_device_with_owner(different_owner)
+        response = self.client.get(path='/devices/')
+        self.assertEqual(HTTP_200_OK, response.status_code)
+
+    def test_return_json_data_when_get_devices_done(self):
+        create_various_devices_with_owner(self.user)
+        different_owner = create_user_with_email('new@gmai.l.com')
+        create_device_with_owner(different_owner)
+        response = self.client.get(path='/devices/')
+        devices = Device.objects.filter(owner=self.user)
+        print(response.data)
+        self.assertEqual(DeviceSerializer(devices, many=True).data, response.data)

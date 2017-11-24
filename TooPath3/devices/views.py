@@ -49,6 +49,11 @@ class DeviceList(APIView):
     authentication_classes = (JSONWebTokenAuthentication, SessionAuthentication, BasicAuthentication,)
     permission_classes = (IsAuthenticated, IsOwnerOrReadOnly,)
 
+    def get(self, request):
+        devices = Device.objects.filter(owner=request.user)
+        serializer = DeviceSerializer(devices, many=True)
+        return Response(data=serializer.data, status=HTTP_200_OK)
+
     def post(self, request):
         data = JSONParser().parse(request)
         serializer = DeviceSerializer(data=data)

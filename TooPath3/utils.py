@@ -31,6 +31,15 @@ def create_device_with_owner(owner):
     return Device.objects.create(name='device_test', device_type='ad', device_privacy='pr', owner=owner)
 
 
+def create_various_devices_with_owner(owner):
+    count = 0
+    while count < 5:
+        device_instance = create_device_with_owner(owner)
+        track_instance = create_track_with_device(device_instance)
+        create_various_track_locations_with_track(track_instance)
+        count += 1
+
+
 def create_track_with_device(device):
     return Track.objects.create(name='track_test', device=device)
 

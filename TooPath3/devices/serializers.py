@@ -2,10 +2,12 @@ from rest_framework import serializers
 
 from TooPath3.constants import DEFAULT_ERROR_MESSAGES
 from TooPath3.models import Device
+from TooPath3.tracks.serializers import TrackSerializer
 
 
 class DeviceSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
+    tracks = TrackSerializer(many=True, read_only=True)
 
     class Meta:
         model = Device
