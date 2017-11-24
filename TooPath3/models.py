@@ -10,6 +10,7 @@ class CustomUser(AbstractUser):
         'Token secret',
         help_text='Changing this will log out user everywhere',
         default=uuid.uuid4)
+    email = models.EmailField(null=False, unique=True)
 
 
 class Device(models.Model):

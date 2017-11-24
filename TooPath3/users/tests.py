@@ -7,7 +7,7 @@ from TooPath3.models import CustomUser
 from TooPath3.users.views import *
 
 # DATA CONSTANTS
-from TooPath3.utils import create_user_with_username, generate_token_for_testing
+from TooPath3.utils import create_user_with_email, generate_token_for_testing
 
 VALID_DATA_USER = {
     "username": "test",
@@ -36,7 +36,7 @@ DATA_LOGIN_NO_USERNAME = {
 class GetUserCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = create_user_with_username('user_test')
+        self.user = create_user_with_email('user@gmail.com')
         self.token = generate_token_for_testing(self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
@@ -45,7 +45,7 @@ class GetUserCase(APITestCase):
         self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
 
     def test_return_403_status_when_user_is_not_self(self):
-        new_user = create_user_with_username('user2')
+        new_user = create_user_with_email('user2@gmail.com')
         response = self.client.get(path='/users/' + str(new_user.pk) + '/')
         self.assertEqual(HTTP_403_FORBIDDEN, response.status_code)
 
@@ -63,7 +63,7 @@ class GetUserCase(APITestCase):
         self.assertEqual(PublicCustomUserSerializer(instance=self.user).data, response.data)
 
 
-class PostUsers(APITestCase):
+class PostUser(APITestCase):
     """
     POST /users
     """
@@ -88,6 +88,36 @@ class PostUsers(APITestCase):
     def test_given_non_existing_users__when_post_users__with_username_email_and_password__then_return_token(self):
         response = self.client.post('/users/', VALID_DATA_USER, format='json')
         self.assertIsNotNone(response.data['token'])
+
+
+class PatchUserCase(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = create_user_with_email('user_test')
+        self.token = generate_token_for_testing(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
+
+    def test_return_404_status_when_user_not_exists(self):
+        response = self.client.patch(path='/users/100/', data={})
+        self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_return_403_status_when_user_is_not_self(self):
+        new_user = create_user_with_email('user2')
+        response = self.client.patch(path='/users/' + str(new_user.pk) + '/', data={})
+        self.assertEqual(HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_return_401_status_when_user_is_not_authenticated(self):
+        self.client.credentials(HTTP_AUTHORIZATION='')
+        response = self.client.patch(path='/users/1/', data={})
+        self.assertEqual(HTTP_401_UNAUTHORIZED, response.status_code)
+
+    def test_return_200_status_when_user_is_patched(self):
+        response = self.client.get(path='/users/' + str(self.user.pk) + '/')
+        self.assertEqual(HTTP_200_OK, response.status_code)
+
+    def test_return_json_with_user_info_status_when_get_user_is_done(self):
+        response = self.client.get(path='/users/' + str(self.user.pk) + '/')
+        self.assertEqual(PublicCustomUserSerializer(instance=self.user).data, response.data)
 
 
 class LoginTest(APITestCase):
