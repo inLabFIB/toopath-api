@@ -94,7 +94,7 @@ class PostUser(APITestCase):
 class PatchUserCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = create_user_with_email('user_test')
+        self.user = create_user_with_email('test@gmail.com')
         self.token = generate_token_for_testing(self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
@@ -131,6 +131,46 @@ class PatchUserCase(APITestCase):
     def test_return_json_with_user_info_status_when_get_user_is_done(self):
         json_data = {'first_name': 'test', 'last_name': 'refactor'}
         response = self.client.patch(path='/users/' + str(self.user.pk) + '/', data=json_data)
+        user_updated = CustomUser.objects.get(pk=self.user.pk)
+        self.assertEqual(PublicCustomUserSerializer(instance=user_updated).data, response.data)
+
+
+class PutUserCase(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = create_user_with_email('test@gmail.com')
+        self.token = generate_token_for_testing(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
+
+    def test_return_404_status_when_user_not_exists(self):
+        response = self.client.put(path='/users/100/', data={})
+        self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_return_403_status_when_user_is_not_self(self):
+        new_user = create_user_with_email('user2@gmail.com')
+        response = self.client.put(path='/users/' + str(new_user.pk) + '/', data={})
+        self.assertEqual(HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_return_401_status_when_user_is_not_authenticated(self):
+        self.client.credentials(HTTP_AUTHORIZATION='')
+        response = self.client.put(path='/users/1/', data={})
+        self.assertEqual(HTTP_401_UNAUTHORIZED, response.status_code)
+
+    def test_return_400_status_when_json_body_is_invalid(self):
+        json_data = {'name': 'test', 'last_name': 'refactor'}
+        response = self.client.put(path='/users/' + str(self.user.pk) + '/', data=json_data)
+        self.assertEqual(HTTP_400_BAD_REQUEST, response.status_code)
+
+    def test_return_200_status_when_user_is_patched(self):
+        json_data = {'email': 'test@gmail.com', 'username': 'testing', 'password': 'text', 'first_name': 'test',
+                     'last_name': 'refactor'}
+        response = self.client.put(path='/users/' + str(self.user.pk) + '/', data=json_data)
+        self.assertEqual(HTTP_200_OK, response.status_code)
+
+    def test_return_json_with_user_info_status_when_get_user_is_done(self):
+        json_data = {'email': 'test@gmail.com', 'username': 'testing', 'password': 'text', 'first_name': 'test',
+                     'last_name': 'refactor'}
+        response = self.client.put(path='/users/' + str(self.user.pk) + '/', data=json_data)
         user_updated = CustomUser.objects.get(pk=self.user.pk)
         self.assertEqual(PublicCustomUserSerializer(instance=user_updated).data, response.data)
 
