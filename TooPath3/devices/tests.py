@@ -161,7 +161,6 @@ class GetDevicesCase(APITestCase):
         create_device_with_owner(different_owner)
         response = self.client.get(path='/devices/')
         devices = Device.objects.filter(owner=self.user)
-        print(response.data)
         self.assertEqual(DeviceSerializer(devices, many=True).data, response.data)
 
 
