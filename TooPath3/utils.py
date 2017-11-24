@@ -34,7 +34,9 @@ def create_device_with_owner(owner):
 def create_various_devices_with_owner(owner):
     count = 0
     while count < 5:
-        create_device_with_owner(owner)
+        device_instance = create_device_with_owner(owner)
+        track_instance = create_track_with_device(device_instance)
+        create_various_track_locations_with_track(track_instance)
         count += 1
 
 
