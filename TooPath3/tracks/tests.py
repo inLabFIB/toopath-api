@@ -44,96 +44,6 @@ class GetTrackCase(APITestCase):
         self.assertEqual(TrackSerializer(track).data, response.data)
 
 
-class GetTrackCase(APITestCase):
-    def setUp(self):
-        self.client = APIClient()
-        self.user = create_user_with_email('user_test')
-        self.token = generate_token_for_testing(self.user)
-        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
-
-    def test_return_404_status_when_device_not_exists(self):
-        response = self.client.get('/devices/100/tracks/')
-        self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
-
-    def test_return_403_status_when_user_has_not_permissions(self):
-        owner = create_user_with_email('owner')
-        device = create_device_with_owner(owner)
-        response = self.client.get('/devices/' + str(device.did) + '/tracks/', {})
-        self.assertEqual(HTTP_403_FORBIDDEN, response.status_code)
-
-    def test_return_401_status_when_user_is_not_authenticated(self):
-        self.client.credentials(HTTP_AUTHORIZATION='')
-        response = self.client.get('/devices/1/tracks/')
-        self.assertEqual(HTTP_401_UNAUTHORIZED, response.status_code)
-
-    def test_return_200_status_when_get_tracks_is_done(self):
-        device = create_device_with_owner(self.user)
-        track = create_track_with_device(device)
-        create_various_track_locations_with_track(track)
-        track2 = create_track_with_device(device)
-        create_various_track_locations_with_track(track2)
-        response = self.client.get('/devices/' + str(device.did) + '/tracks/')
-        self.assertEqual(HTTP_200_OK, response.status_code)
-
-    def test_return_json_with_tracks_info_when_get_track_is_done(self):
-        device = create_device_with_owner(self.user)
-        track = create_track_with_device(device)
-        create_various_track_locations_with_track(track)
-        track2 = create_track_with_device(device)
-        create_various_track_locations_with_track(track2)
-        response = self.client.get('/devices/' + str(device.did) + '/tracks/')
-        tracks = Track.objects.filter(device=device)
-        self.assertEqual(TrackSerializer(tracks, many=True).data, response.data)
-
-
-class PostTracksCase(APITestCase):
-    def setUp(self):
-        self.client = APIClient()
-        self.user = create_user_with_email('user_test')
-        self.token = generate_token_for_testing(self.user)
-        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
-
-    def test_return_404_status_when_device_not_exists(self):
-        response = self.client.post('/devices/100/tracks/', {})
-        self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
-
-    def test_return_403_status_when_user_has_not_permissions(self):
-        owner = create_user_with_email('owner')
-        device = create_device_with_owner(owner)
-        response = self.client.post('/devices/' + str(device.did) + '/tracks/', {})
-        self.assertEqual(HTTP_403_FORBIDDEN, response.status_code)
-
-    def test_return_401_status_when_user_is_not_authenticated(self):
-        self.client.credentials(HTTP_AUTHORIZATION='')
-        response = self.client.post('/devices/100/tracks/', {})
-        self.assertEqual(HTTP_401_UNAUTHORIZED, response.status_code)
-
-    def test_return_400_status_when_json_body_is_invalid(self):
-        device = create_device_with_owner(self.user)
-        response = self.client.post('/devices/' + str(device.did) + '/tracks/', {"description": "name missing"})
-        self.assertEqual(HTTP_400_BAD_REQUEST, response.status_code)
-
-    def test_return_201_status_when_track_is_created(self):
-        device = create_device_with_owner(self.user)
-        response = self.client.post('/devices/' + str(device.did) + '/tracks/',
-                                    {"name": "test_track", "description": "this is a description"})
-        self.assertEqual(HTTP_201_CREATED, response.status_code)
-
-    def test_instance_exists_when_track_is_created(self):
-        device = create_device_with_owner(self.user)
-        self.client.post('/devices/' + str(device.did) + '/tracks/',
-                         {"name": "test_track", "description": "this is a description"})
-        track = Track.objects.get(pk=get_latest_id_inserted(Track))
-        self.assertIsNotNone(track)
-
-    def test_return_json_with_instance_info_when_track_is_created(self):
-        device = create_device_with_owner(self.user)
-        response = self.client.post('/devices/' + str(device.did) + '/tracks/',
-                                    {"name": "test_track", "description": "this is a description"})
-        track_created = Track.objects.get(pk=get_latest_id_inserted(Track))
-        self.assertEqual(TrackSerializer(track_created).data, response.data)
-
-
 class PatchTrackCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
@@ -256,3 +166,93 @@ class PutTrackCase(APITestCase):
                                    {"name": "new_name", "device": device.did})
         track_updated = Track.objects.get(pk=get_latest_id_inserted(Track))
         self.assertEqual(TrackSerializer(track_updated).data, response.data)
+
+
+class GetTracksCase(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = create_user_with_email('user_test')
+        self.token = generate_token_for_testing(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
+
+    def test_return_404_status_when_device_not_exists(self):
+        response = self.client.get('/devices/100/tracks/')
+        self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_return_403_status_when_user_has_not_permissions(self):
+        owner = create_user_with_email('owner')
+        device = create_device_with_owner(owner)
+        response = self.client.get('/devices/' + str(device.did) + '/tracks/', {})
+        self.assertEqual(HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_return_401_status_when_user_is_not_authenticated(self):
+        self.client.credentials(HTTP_AUTHORIZATION='')
+        response = self.client.get('/devices/1/tracks/')
+        self.assertEqual(HTTP_401_UNAUTHORIZED, response.status_code)
+
+    def test_return_200_status_when_get_tracks_is_done(self):
+        device = create_device_with_owner(self.user)
+        track = create_track_with_device(device)
+        create_various_track_locations_with_track(track)
+        track2 = create_track_with_device(device)
+        create_various_track_locations_with_track(track2)
+        response = self.client.get('/devices/' + str(device.did) + '/tracks/')
+        self.assertEqual(HTTP_200_OK, response.status_code)
+
+    def test_return_json_with_tracks_info_when_get_track_is_done(self):
+        device = create_device_with_owner(self.user)
+        track = create_track_with_device(device)
+        create_various_track_locations_with_track(track)
+        track2 = create_track_with_device(device)
+        create_various_track_locations_with_track(track2)
+        response = self.client.get('/devices/' + str(device.did) + '/tracks/')
+        tracks = Track.objects.filter(device=device)
+        self.assertEqual(TrackSerializer(tracks, many=True).data, response.data)
+
+
+class PostTracksCase(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = create_user_with_email('user_test')
+        self.token = generate_token_for_testing(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
+
+    def test_return_404_status_when_device_not_exists(self):
+        response = self.client.post('/devices/100/tracks/', {})
+        self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_return_403_status_when_user_has_not_permissions(self):
+        owner = create_user_with_email('owner')
+        device = create_device_with_owner(owner)
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/', {})
+        self.assertEqual(HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_return_401_status_when_user_is_not_authenticated(self):
+        self.client.credentials(HTTP_AUTHORIZATION='')
+        response = self.client.post('/devices/100/tracks/', {})
+        self.assertEqual(HTTP_401_UNAUTHORIZED, response.status_code)
+
+    def test_return_400_status_when_json_body_is_invalid(self):
+        device = create_device_with_owner(self.user)
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/', {"description": "name missing"})
+        self.assertEqual(HTTP_400_BAD_REQUEST, response.status_code)
+
+    def test_return_201_status_when_track_is_created(self):
+        device = create_device_with_owner(self.user)
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/',
+                                    {"name": "test_track", "description": "this is a description"})
+        self.assertEqual(HTTP_201_CREATED, response.status_code)
+
+    def test_instance_exists_when_track_is_created(self):
+        device = create_device_with_owner(self.user)
+        self.client.post('/devices/' + str(device.did) + '/tracks/',
+                         {"name": "test_track", "description": "this is a description"})
+        track = Track.objects.get(pk=get_latest_id_inserted(Track))
+        self.assertIsNotNone(track)
+
+    def test_return_json_with_instance_info_when_track_is_created(self):
+        device = create_device_with_owner(self.user)
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/',
+                                    {"name": "test_track", "description": "this is a description"})
+        track_created = Track.objects.get(pk=get_latest_id_inserted(Track))
+        self.assertEqual(TrackSerializer(track_created).data, response.data)

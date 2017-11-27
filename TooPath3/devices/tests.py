@@ -160,7 +160,7 @@ class GetDevicesCase(APITestCase):
         response = self.client.get(path='/devices/')
         self.assertEqual(HTTP_200_OK, response.status_code)
 
-    def test_return_json_data_when_get_devices_done(self):
+    def test_return_json_response_when_get_devices_done(self):
         create_various_devices_with_owner(self.user)
         different_owner = create_user_with_email('new@gmai.l.com')
         create_device_with_owner(different_owner)
@@ -169,50 +169,49 @@ class GetDevicesCase(APITestCase):
         self.assertEqual(DeviceSerializer(devices, many=True).data, response.data)
 
 
-class PostDevice(APITestCase):
+class PostDeviceCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = CustomUser.objects.create(username='test', password=make_password('password'))
-        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
-        payload = jwt_payload_handler(self.user)
-        self.token = jwt_encode_handler(payload)
-
-    def test_given_non_existing_device__when_post_device_with_valid_information__then_return_created_status(self):
+        self.user = create_user_with_email('test@gmail.com')
+        self.token = generate_token_for_testing(self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
-        response = self.client.post('/devices/', VALID_DATA_POST_DEVICE)
-        self.assertEqual(response.status_code, HTTP_201_CREATED)
 
-    def test_given_non_existing_device__when_post_device_with_invalid_information__then_return_bad_response_status(
+    def test_return_401_status_when_user_not_authenticated(self):
+        self.client.credentials(HTTP_AUTHORIZATION='')
+        response = self.client.post(path='/devices/', data={}, format='json')
+        self.assertEqual(HTTP_401_UNAUTHORIZED, response.status_code)
+
+    def test_return_400_status_when_json_body_is_invalid(self):
+        json_body = {"device_name": "test", "device_type": "ad", "device_privacy": "pr"}
+        response = self.client.post(path='/devices/', data=json_body, format='json')
+        self.assertEqual(HTTP_400_BAD_REQUEST, response.status_code)
+
+    def test_return_201_status_when_post_device_is_done(self):
+        json_body = {"name": "test"}
+        response = self.client.post(path='/devices/', data=json_body, format='json')
+        self.assertEqual(HTTP_201_CREATED, response.status_code)
+
+    def test_instance_created_when_post_device_is_done(self):
+        json_body = {"name": "test"}
+        self.client.post(path='/devices/', data=json_body, format='json')
+        device_created = Device.objects.get(pk=get_latest_id_inserted(Device))
+        self.assertIsNotNone(device_created)
+
+    def test_return_json_response_when_post_device_is_done(self):
+        json_body = {"name": "test"}
+        response = self.client.post(path='/devices/', data=json_body, format='json')
+        device_created = Device.objects.get(pk=get_latest_id_inserted(Device))
+        self.assertEqual(DeviceSerializer(instance=device_created).data, response.data)
+
+    def test_owner_in_json_response_when_post_device_is_done(self):
+        json_body = {"name": "test"}
+        response = self.client.post(path='/devices/', data=json_body, format='json')
+        self.assertEqual(self.user.username, response.data['owner'])
+
+    def test_token_corresponds_with_owner_in_json_response_when_post_is_done(
             self):
-        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
-        response = self.client.post('/devices/', INVALID_DATA_POST_DEVICE)
-        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
-
-    def test_given_non_existing_device__when_post_device_with_valid_information__then_check_device_database_entry_exist(
-            self):
-        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
-        response = self.client.post('/devices/', VALID_DATA_POST_DEVICE)
-        device = Device.objects.get(pk=response.data['did'])
-        self.assertIsNotNone(device)
-
-    def test_given_non_existing_device__when_post_device_with_valid_information__then_return_device_information_on_response(
-            self):
-        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
-        response = self.client.post('/devices/', VALID_DATA_POST_DEVICE)
-        self.assertEqual(response.data['owner'], 'test')
-
-    def test_given_non_existing_device__when_post_device_with_valid_information__then_owner_corresponds_with_token(
-            self):
-        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
-        response = self.client.post('/devices/', VALID_DATA_POST_DEVICE)
+        json_body = {"name": "test"}
+        response = self.client.post(path='/devices/', data=json_body, format='json')
         payload = jwt_decode_handler(self.token)
         username = jwt_get_username_from_payload(payload)
         self.assertEqual(response.data['owner'], username)
-
-    def test_given_non_existing_device__when_post_device_with_valid_information__then_has_relation_with_actual_location_entry_exist(
-            self):
-        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
-        response = self.client.post('/devices/', VALID_DATA_POST_DEVICE)
-        device = Device.objects.get(pk=response.data['did'])
-        self.assertIsInstance(device.actuallocation, ActualLocation)

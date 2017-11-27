@@ -52,9 +52,8 @@ class DeviceList(APIView):
         return Response(data=serializer.data, status=HTTP_200_OK)
 
     def post(self, request):
-        data = JSONParser().parse(request)
-        serializer = DeviceSerializer(data=data)
+        serializer = DeviceSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(owner=request.user)
-            return Response(data=serializer.data, status=HTTP_201_CREATED)
+            new_device = serializer.save(owner=request.user)
+            return Response(data=DeviceSerializer(new_device).data, status=HTTP_201_CREATED)
         return Response(data=serializer.errors, status=HTTP_400_BAD_REQUEST)
