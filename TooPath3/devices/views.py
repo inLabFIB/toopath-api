@@ -35,13 +35,10 @@ class DeviceDetail(APIView):
 
     def put(self, request, d_pk):
         device = self.get_object(pk=d_pk)
-        data = JSONParser().parse(request)
-        if 'name' not in data:
-            data['name'] = device.name
-        serializer = DeviceSerializer(instance=device, data=data)
+        serializer = DeviceSerializer(instance=device, data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(data=serializer.validated_data, status=HTTP_200_OK)
+            device_updated = serializer.save()
+            return Response(data=DeviceSerializer(device_updated).data, status=HTTP_200_OK)
         return Response(data=serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 

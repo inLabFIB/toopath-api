@@ -63,7 +63,7 @@ class GetDeviceCase(APITestCase):
         self.assertEqual(DeviceSerializer(device).data, response.data)
 
 
-class PatchDevice(APITestCase):
+class PatchDeviceCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = create_user_with_email('user_test')
@@ -91,49 +91,54 @@ class PatchDevice(APITestCase):
         self.assertEqual(HTTP_400_BAD_REQUEST, response.status_code)
 
 
-class PutDevice(APITestCase):
-    """
-    PUT /devices/:id
-    """
-
+class PutDeviceCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = CustomUser.objects.create(email='test@gmail.com', username='test',
-                                              password=make_password('password'))
-        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
-        payload = jwt_payload_handler(self.user)
-        self.token = jwt_encode_handler(payload)
-        Device.objects.create(did=1, name='car', ip_address='0.0.0.0', device_type='ad', device_privacy='pr',
-                              port_number='8080', owner=self.user)
-        # user2 creation
-        self.user2 = CustomUser.objects.create(email='test2@gmail.com', username='test2', password=make_password(
-            'password'))
-        payload = jwt_payload_handler(self.user2)
-        self.token2 = jwt_encode_handler(payload)
-
-    def test_given_existing_device__when_put_device_with_existing_device_id_and_valid_data__then_return_ok(self):
+        self.user = create_user_with_email('user_test')
+        self.token = generate_token_for_testing(self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
-        response = self.client.put('/devices/1/', VALID_DATA_PUT_DEVICE, format='json')
-        self.assertEqual(response.status_code, HTTP_200_OK)
 
-    def test_given_existing_device__when_put_device_with_non_existing_device_id_and_valid_data__then_return_ok(self):
-        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
-        response = self.client.put('/devices/10/', VALID_DATA_PUT_DEVICE, format='json')
-        self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
+    def test_return_404_status_when_device_not_found(self):
+        response = self.client.put(path='/devices/10/', data={}, format='json')
+        self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
 
-    def test_given_existing_device__when_put_device_with_existing_device_id_and_valid_data__then_return_ip_address(
-            self):
-        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
-        self.client.put('/devices/1/', VALID_DATA_PUT_DEVICE, format='json')
-        device = Device.objects.get(pk=1)
-        self.assertEqual(device.ip_address, '127.0.0.1')
+    def test_return_403_status_when_user_has_not_permissions(self):
+        owner = create_user_with_email(email='owner@gmail.com')
+        device = create_device_with_owner(owner=owner)
+        response = self.client.put(path='/devices/' + str(device.did) + '/', data={}, format='json')
+        self.assertEqual(HTTP_403_FORBIDDEN, response.status_code)
 
-    def test_given_existing_device__when_put_device_with_user_logged_different_than_device_owner__then_return_no_permission(
-            self):
-        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token2)
-        response = self.client.put('/devices/1/', VALID_DATA_PUT_DEVICE, format='json')
-        self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
+    def test_return_401_status_when_user_not_authenticated(self):
+        self.client.credentials(HTTP_AUTHORIZATION='')
+        response = self.client.put(path='/devices/1/', data={}, format='json')
+        self.assertEqual(HTTP_401_UNAUTHORIZED, response.status_code)
+
+    def test_return_400_status_when_json_body_is_invalid(self):
+        device = create_device_with_owner(owner=self.user)
+        json_body = {"device_name": "test", "ip_address": "127.0.0.1"}
+        response = self.client.put(path='/devices/' + str(device.did) + '/', data=json_body, format='json')
+        self.assertEqual(HTTP_400_BAD_REQUEST, response.status_code)
+
+    def test_return_200_status_when_put_device_is_done(self):
+        device = create_device_with_owner(owner=self.user)
+        json_body = {"name": "test", "ip_address": "127.0.0.1"}
+        response = self.client.put(path='/devices/' + str(device.did) + '/', data=json_body, format='json')
+        self.assertEqual(HTTP_200_OK, response.status_code)
+
+    def test_return_json_data_when_put_device_is_done(self):
+        device = create_device_with_owner(owner=self.user)
+        json_body = {"name": "test", "ip_address": "127.0.0.1"}
+        response = self.client.put(path='/devices/' + str(device.did) + '/', data=json_body, format='json')
+        device_updated = Device.objects.get(pk=device.did)
+        self.assertEqual(DeviceSerializer(device_updated).data, response.data)
+
+    def test_check_instance_modified_when_put_device_is_done(self):
+        device = create_device_with_owner(owner=self.user)
+        json_body = {"name": "test", "ip_address": "127.0.0.1"}
+        self.client.put(path='/devices/' + str(device.did) + '/', data=json_body, format='json')
+        device_updated = Device.objects.get(pk=device.did)
+        expected_ip_address = "127.0.0.1"
+        self.assertEqual(expected_ip_address, device_updated.ip_address)
 
 
 class GetDevicesCase(APITestCase):
