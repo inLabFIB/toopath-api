@@ -1,36 +1,126 @@
 # TooPath v3
 
-## Base Instructions
+TooPath is an API that let you manage tracks and locations related to a device.
 
-1. Install **[python 3.6.1](https://www.python.org/downloads/)**
-2. Install **[virtualenvwrapper](https://pypi.python.org/pypi/virtualenvwrapper-win)** via ```easy_install virtualenvwrapper-win```.
-3. Create new environment using ```mkvirtualenv virt_env_toopath```
-4. If **env** is not automatically activated, then use ```workon virt_env_toopath```
-5. Install all requirements with ```pip install -r requirements.txt```
-6. Install **OSGeo4W** following the steps in **[GeoDjango Tutorial](https://docs.djangoproject.com/en/1.11/ref/contrib/gis/install/#osgeo4w)**
-7. Install **[VirtualBox 5.1](https://www.virtualbox.org/wiki/Downloads)**  and turn on Vagrant machine with ```vagrant up```
+## Getting Started
 
-## PyCharm setup
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+
+### Prerequisites
+
+* Install **[python 3.6.1](https://www.python.org/downloads/)**.
+* Install **OSGeo4W** following the steps in **[GeoDjango Tutorial](https://docs.djangoproject.com/en/2.0/ref/contrib/gis/tutorial/)** (make sure to install the same bit version of python and OSGeo4W.
+* Install **[PyCharm](https://www.jetbrains.com/pycharm/download/)** (optional, recommended for windows users).
+
+#### Windows
+
+* Install **[virtualenvwrapper-win](https://pypi.python.org/pypi/virtualenvwrapper-win)** via ```easy_install virtualenvwrapper-win```
+* Install **[VirtualBox 5.1](https://www.virtualbox.org/wiki/Downloads)**.
+* Install **[Vagrant 2.0.1](https://www.vagrantup.com/downloads.html)**.
+
+#### Linux
+
+* Install **[virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/)** via ```pip install virtualenvwrapper```.
+* Install **[PostgreSQL 9.6](https://www.postgresql.org/download/)**.
+* Install **[PostGIS 2.3](http://postgis.net/install/)**.
+
+### Environment setup
+
+This environment setup can be done via console and also, via PyCharm console (if you have installed this IDE).
+First of all, create a virtual environment:
+
+```
+mkvirtualenv [virtual_environment_name]
+```
+
+If the virtual environment is not automatically activated, then use:
+
+```
+workon [virtual_environment_name]
+```
+
+Install all the python requirements:
+
+```
+pip install -r requirements.txt
+```
+
+As it is recommended on this **[settings tutorial](https://medium.com/@ayarshabeer/django-best-practice-settings-file-for-multiple-environments-6d71c6966ee2)**, this project has production and local separate settings. To use the local settings setup your **DJANGO_SETTINGS_MODULE** environment variable to ```TooPath3.settings.local```.
+
+For windows users, follow this **[Getting started of Vagrant](https://www.vagrantup.com/intro/getting-started/index.html)** to create a virtual machine with **PostgreSQL** and **PostGIS** (use the versions on [Linux](#Linux) section).
+
+For linux users, you can create the database with the **PostgreSQL** and **PostGIS** previously installed.
+
+Apply all the migrations with:
+
+```
+python manage.py migrate
+```
+
+#### PyCharm setup
 
 1. Go to  *File>Settings>Project:"name">Project interpreter>Add local*
-2. Select **python.exe** from **virt_env_toopath** folder
+2. Select **python.exe** from **[virtual_environment_name]** folder
 3. Mark *Associate this virtual environment with current project*
 4. Configure the settings **INSTALLED_APPS** and **DATABASES** following the steps in **[Configure settings.py](https://docs.djangoproject.com/en/1.11/ref/contrib/gis/tutorial/#configure-settings-py)**
 
-## Django commands
+## Running the API
 
-### Migrations
-With Django, migrations become easier, it will generate migrations from the data models. Migrations will be saved with an automatic number identifier in *migrations* folder inside of the corresponding app.
+Use ```python manage.py runserver x.x.x.x:aaaa``` where x.x.x.x is the address and aaaa is the port. For local example:
 
-Use ```python manage.py makemigrations --settings=TooPath3.settings.local``` to create migrations
+```
+python manage.py runserver 127.0.0.1:8080
+```
 
-Use ```python manage.py migrate --settings=TooPath3.settings.local``` to apply migrations
+## Running the tests
 
-### Get it up
-Use ```python manage.py runserver x.x.x.x:aaaa``` where x.x.x.x is the address and aaaa is the port
+Once you’ve written tests, run them using the test command of your project’s **manage.py** utility:
 
-On local use ```python manage.py runserver 127.0.0.1:8080 --settings=TooPath3.settings.local```
+```
+python manage.py test
+```
 
-On DEMO-VM use ```python manage.py runserver 127.0.0.1:8080 --settings=TooPath3.settings.production```
+If you wanna run a concrete test you can do it specifying the package. For example, to run the devices test:
 
-In case of migrates aren't applied you can follow the steps of the Migrations section using ```--settings=TooPath3.settings.production```
+```
+python manage.py test TooPath3.devices.tests
+```
+
+## Deployment (production)
+
+To apply the migrations on the production environment use:
+
+```
+python manage.py migrate --settings=TooPath3.settings.production
+```
+
+To start the API on the production enviroment use:
+
+```
+python manage.py runserver x.x.x.x:aaaa --settings=TooPath3.settings.production
+```
+
+Youn can also setup the **DJANGO_SETTINGS_MODULE** environment variable to ```TooPath3.settings.production```.
+
+## Built With
+
+* **[Django REST](http://www.django-rest-framework.org/)** - framework used.
+* **[Django REST-gis](https://github.com/djangonauts/django-rest-framework-gis)** - Geographic add-ons for Django REST.
+* **[Jenkins](https://jenkins-ci.org/)** - Integration tool
+
+## Authors
+
+* Albert Díaz Benitez - *First stable version* - **[AlbertWayne](https://github.com/AlbertWayne)**
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/AlbertWayne/TooPath/tags).
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+## Acknowledgments
+
+* [inLab FIB](https://github.com/inLabFIB)
+* [Jaume Figueras](https://github.com/JaumeFigueras) and [José Francisco Crespo](https://github.com/josefran)
