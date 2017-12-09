@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
 from TooPath3.constants import DEFAULT_ERROR_MESSAGES
@@ -15,6 +16,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(DEFAULT_ERROR_MESSAGES['invalid_patch'])
             if bool(data) is False or len(self.initial_data) != len(data):
                 raise serializers.ValidationError(DEFAULT_ERROR_MESSAGES['patch_device_fields_required'])
+        if 'password' in data:
+            data['password'] = make_password(data['password'])
         return data
 
 

@@ -1,5 +1,6 @@
 import jwt
 from rest_framework.test import APITestCase, APIClient
+from rest_framework_jwt.settings import api_settings
 
 from TooPath3.constants import DEFAULT_ERROR_MESSAGES
 from TooPath3.users.views import *
@@ -61,6 +62,7 @@ class PostUserCase(APITestCase):
         json_body_invalid = {'user_name': 'test', 'email': 'test@gmail.com', 'password': 'test_password'}
         response = self.client.post(path='/users/', data=json_body_invalid, format='json')
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
+
 
 class PatchUserCase(APITestCase):
     def setUp(self):
@@ -145,9 +147,8 @@ class PutUserCase(APITestCase):
         user_updated = CustomUser.objects.get(pk=self.user.pk)
         self.assertEqual(PublicCustomUserSerializer(instance=user_updated).data, response.data)
 
-"""
-class LoginTest(APITestCase):
 
+class LoginTestCase(APITestCase):
     class PayloadObject:
         def __init__(self, username, pk):
             self.username = username
@@ -157,35 +158,40 @@ class LoginTest(APITestCase):
         self.client = APIClient()
         self.user = CustomUser.objects.create(username="test", email='test@test.com', password=make_password('test'))
 
-    def test_given_existing_user__when_post_login__with_valid_username_and_password__then_return_ok(self):
-        response = self.client.post('/login/', VALID_DATA_LOGIN, format='json')
+    def test_return_200_status__when_login_is_done(self):
+        json_body = {"username": self.user.username, "password": "test"}
+        response = self.client.post(path='/login/', data=json_body, format='json')
         self.assertEqual(response.status_code, HTTP_200_OK)
 
-    def test_given_existing_user__when_post_login__with_valid_username_and_password__then_return_token(self):
-        response = self.client.post('/login/', VALID_DATA_LOGIN, format='json')
+    def test_check_token_in_response__when_login_is_done(self):
+        json_body = {"username": self.user.username, "password": "test"}
+        response = self.client.post(path='/login/', data=json_body, format='json')
         self.assertIsNotNone(response.data['token'])
 
-    def test_given_existing_user__when_post_login__with_invalid_username_or_password__then_return_bad_request(self):
-        response = self.client.post('/login/', INVALID_DATA_LOGIN, format='json')
+    def test_return_400_status__when_json_body_is_invalid(self):
+        json_body_invalid = {"user": self.user.username, "password": self.user.password}
+        response = self.client.post(path='/login/', data=json_body_invalid, format='json')
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
 
-    def test_given_existing_user__when_post_login__with_no_password__then_return_password_needed_error(self):
-        response = self.client.post('/login/', DATA_LOGIN_NO_PASSWORD, format='json')
+    def test_return_password_field_required__when_json_body_have_not_password(self):
+        json_body_no_password = {"username": self.user.username}
+        response = self.client.post(path='/login/', data=json_body_no_password, format='json')
         self.assertEqual(response.data['password'], ['This field is required.'])
 
-    def test_given_existing_user__when_post_login__with_no_username__then_return_username_needed_error(self):
-        response = self.client.post('/login/', DATA_LOGIN_NO_USERNAME, format='json')
+    def test_return_username_field_required__when_json_body_have_not_username(self):
+        json_body_no_username = {"password": self.user.password}
+        response = self.client.post(path='/login/', data=json_body_no_username, format='json')
         self.assertEqual(response.data['username'], ['This field is required.'])
 
-    def test_given_existing_user__when_post_verify_token__with_generated_token__then_return_ok_status(self):
+    def test_generated_token_works_when_login_is_done(self):
         user_jwt_secret = str(self.user.jwt_secret)
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-        payload_object = LoginTest.PayloadObject(self.user.username, self.user.pk)
+        payload_object = LoginTestCase.PayloadObject(self.user.username, self.user.pk)
         payload = jwt_payload_handler(payload_object)
         token = jwt.encode(
             payload,
             user_jwt_secret,
             api_settings.JWT_ALGORITHM
         ).decode('utf-8')
-        response = self.client.post('/api-token-verify/', {"token": token}, format='json')
-        self.assertEqual(response.status_code, HTTP_200_OK)"""
+        response = self.client.post(path='/api-token-verify/', data={"token": token}, format='json')
+        self.assertEqual(response.status_code, HTTP_200_OK)
