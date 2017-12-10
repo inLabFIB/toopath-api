@@ -25,4 +25,4 @@ class CustomUserSerializer(serializers.ModelSerializer):
 class PublicCustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        exclude = ('password', 'jwt_secret')
+        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'date_joined', 'last_login')
