@@ -5,17 +5,11 @@ from TooPath3.constants import DEFAULT_ERROR_MESSAGES
 from TooPath3.models import ActualLocation, TrackLocation
 
 
-class CoordinatesSerializer(serializers.Serializer):
-    latitude = serializers.FloatField()
-    longitude = serializers.FloatField()
-
-
 class ActualLocationSerializer(GeoFeatureModelSerializer):
     class Meta:
         model = ActualLocation
         geo_field = 'point'
         fields = '__all__'
-        read_only_fields = ('device',)
 
     def validate(self, data):
         _validate_latitude_and_longitude(data)

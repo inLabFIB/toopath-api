@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from TooPath3.devices.permissions import IsOwnerOrReadOnly
-from TooPath3.locations.serializers import CoordinatesSerializer, ActualLocationSerializer, TrackLocationSerializer
+from TooPath3.locations.serializers import ActualLocationSerializer, TrackLocationSerializer
 from TooPath3.models import ActualLocation, Track, Device
 
 
@@ -20,28 +20,19 @@ class DeviceActualLocation(APIView):
         self.check_object_permissions(self.request, obj=obj)
         return obj
 
-    def get(self, request, pk):
-        actual_location = self.get_object(pk)
-        serializer = ActualLocationSerializer(actual_location)
+    def get(self, request, d_pk):
+        actual_location = self.get_object(d_pk)
+        serializer = ActualLocationSerializer(instance=actual_location)
         if serializer.is_valid:
-            return Response(serializer.data, status=HTTP_200_OK)
+            return Response(data=serializer.data, status=HTTP_200_OK)
 
-    def put(self, request, pk):
-        actual_location = self.get_object(pk)
-        data = request.data
-        serializer = CoordinatesSerializer(data=data)
+    def put(self, request, d_pk):
+        actual_location = self.get_object(d_pk)
+        serializer = ActualLocationSerializer(instance=actual_location, data=request.data)
         if serializer.is_valid():
-            geo_json = {
-                'point': {
-                    'type': 'Point',
-                    'coordinates': [serializer.validated_data['latitude'], serializer.validated_data['longitude']]
-                }
-            }
-            serializer = ActualLocationSerializer(actual_location, data=geo_json)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(status=HTTP_200_OK)
-        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+            actual_location_updated = serializer.save()
+            return Response(data=ActualLocationSerializer(instance=actual_location_updated).data, status=HTTP_200_OK)
+        return Response(data=serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
 class TrackLocationList(APIView):
@@ -60,5 +51,5 @@ class TrackLocationList(APIView):
         serializer = TrackLocationSerializer(data=request.data)
         if serializer.is_valid():
             track_location_created = serializer.save()
-            return Response(TrackLocationSerializer(track_location_created).data, status=HTTP_201_CREATED)
-        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+            return Response(data=TrackLocationSerializer(instance=track_location_created).data, status=HTTP_201_CREATED)
+        return Response(data=serializer.errors, status=HTTP_400_BAD_REQUEST)
