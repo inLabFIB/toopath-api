@@ -10,6 +10,7 @@ class ActualLocationSerializer(GeoFeatureModelSerializer):
         model = ActualLocation
         geo_field = 'point'
         fields = '__all__'
+        read_only_fields = ('device',)
 
     def validate(self, data):
         _validate_latitude_and_longitude(data)
