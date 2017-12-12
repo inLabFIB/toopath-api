@@ -15,7 +15,7 @@ urlpatterns = [
     url(r'^devices/$', devices_views.DeviceList.as_view()),
     url(r'^users/(?P<u_pk>[0-9]+)/$', users_views.UserDetail.as_view()),
     url(r'^users/$', users_views.UserList.as_view()),
-    url(r'^login/$', obtain_jwt_token),
+    url(r'^login/$', users_views.UserLogin.as_view()),
     url(r'^api-token-refresh/$', refresh_jwt_token),
     url(r'^api-token-verify/$', verify_jwt_token),
 ]

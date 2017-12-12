@@ -1,17 +1,16 @@
-from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.decorators import api_view
-from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import *
 from rest_framework.views import APIView
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
+from TooPath3.constants import DEFAULT_ERROR_MESSAGES
 from TooPath3.devices.permissions import IsOwnerOrReadOnly
 from TooPath3.models import CustomUser
-from TooPath3.users.serializers import CustomUserSerializer, PublicCustomUserSerializer
+from TooPath3.users.serializers import CustomUserSerializer, PublicCustomUserSerializer, LoginSerializer
+from TooPath3.utils import generate_token_for_user
 
 
 class UserDetail(APIView):
@@ -51,4 +50,19 @@ class UserList(APIView):
         if serializer.is_valid():
             user_created = serializer.save()
             return Response(data=PublicCustomUserSerializer(instance=user_created).data, status=HTTP_201_CREATED)
+        return Response(data=serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+
+class UserLogin(APIView):
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                user = CustomUser.objects.get(email=serializer.validated_data['email'])
+            except CustomUser.DoesNotExist:
+                return Response(data=DEFAULT_ERROR_MESSAGES['invalid_email'], status=HTTP_400_BAD_REQUEST)
+            if not user.check_password(serializer.validated_data['password']):
+                return Response(data=DEFAULT_ERROR_MESSAGES['invalid_password'], status=HTTP_400_BAD_REQUEST)
+            response_data = {'token': generate_token_for_user(user)}
+            return Response(data=response_data, status=HTTP_200_OK)
         return Response(data=serializer.errors, status=HTTP_400_BAD_REQUEST)

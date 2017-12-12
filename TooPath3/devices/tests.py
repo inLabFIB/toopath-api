@@ -31,7 +31,7 @@ class GetDeviceCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = create_user_with_email(email='user@gmail.com')
-        self.token = generate_token_for_testing(user=self.user)
+        self.token = generate_token_for_user(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
     def test_return_404_status_when_device_is_not_found(self):
@@ -67,7 +67,7 @@ class PatchDeviceCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = create_user_with_email('user_test')
-        self.token = generate_token_for_testing(self.user)
+        self.token = generate_token_for_user(self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
     def test_return_404_status_when_device_not_exists(self):
@@ -95,7 +95,7 @@ class PutDeviceCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = create_user_with_email('user_test')
-        self.token = generate_token_for_testing(self.user)
+        self.token = generate_token_for_user(self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
     def test_return_404_status_when_device_not_found(self):
@@ -145,7 +145,7 @@ class GetDevicesCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = create_user_with_email('test@gmail.com')
-        self.token = generate_token_for_testing(self.user)
+        self.token = generate_token_for_user(self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
     def test_return_401_when_user_not_authenticated(self):
@@ -173,7 +173,7 @@ class PostDeviceCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = create_user_with_email('test@gmail.com')
-        self.token = generate_token_for_testing(self.user)
+        self.token = generate_token_for_user(self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
     def test_return_401_status_when_user_not_authenticated(self):

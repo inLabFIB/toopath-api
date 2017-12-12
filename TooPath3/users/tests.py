@@ -1,17 +1,18 @@
 import jwt
+from django.contrib.auth.hashers import make_password
 from rest_framework.test import APITestCase, APIClient
 from rest_framework_jwt.settings import api_settings
 
 from TooPath3.constants import DEFAULT_ERROR_MESSAGES
 from TooPath3.users.views import *
-from TooPath3.utils import create_user_with_email, generate_token_for_testing, get_latest_id_inserted
+from TooPath3.utils import create_user_with_email, generate_token_for_user, get_latest_id_inserted
 
 
 class GetUserCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = create_user_with_email('user@gmail.com')
-        self.token = generate_token_for_testing(self.user)
+        self.token = generate_token_for_user(self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
     def test_return_404_status_when_user_not_exists(self):
@@ -68,7 +69,7 @@ class PatchUserCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = create_user_with_email('test@gmail.com')
-        self.token = generate_token_for_testing(self.user)
+        self.token = generate_token_for_user(self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
     def test_return_404_status_when_user_not_exists(self):
@@ -112,7 +113,7 @@ class PutUserCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = create_user_with_email('test@gmail.com')
-        self.token = generate_token_for_testing(self.user)
+        self.token = generate_token_for_user(self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
     def test_return_404_status_when_user_not_exists(self):
@@ -159,29 +160,39 @@ class LoginTestCase(APITestCase):
         self.user = CustomUser.objects.create(username="test", email='test@test.com', password=make_password('test'))
 
     def test_return_200_status__when_login_is_done(self):
-        json_body = {"username": self.user.username, "password": "test"}
+        json_body = {"email": self.user.email, "password": "test"}
         response = self.client.post(path='/login/', data=json_body, format='json')
         self.assertEqual(response.status_code, HTTP_200_OK)
 
     def test_check_token_in_response__when_login_is_done(self):
-        json_body = {"username": self.user.username, "password": "test"}
+        json_body = {"email": self.user.email, "password": "test"}
         response = self.client.post(path='/login/', data=json_body, format='json')
         self.assertIsNotNone(response.data['token'])
 
     def test_return_400_status__when_json_body_is_invalid(self):
-        json_body_invalid = {"user": self.user.username, "password": self.user.password}
+        json_body_invalid = {"em": self.user.email, "password": self.user.password}
         response = self.client.post(path='/login/', data=json_body_invalid, format='json')
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
 
     def test_return_password_field_required__when_json_body_have_not_password(self):
-        json_body_no_password = {"username": self.user.username}
+        json_body_no_password = {"email": self.user.email}
         response = self.client.post(path='/login/', data=json_body_no_password, format='json')
         self.assertEqual(response.data['password'], ['This field is required.'])
 
     def test_return_username_field_required__when_json_body_have_not_username(self):
         json_body_no_username = {"password": self.user.password}
         response = self.client.post(path='/login/', data=json_body_no_username, format='json')
-        self.assertEqual(response.data['username'], ['This field is required.'])
+        self.assertEqual(response.data['email'], ['This field is required.'])
+
+    def test_return_invalid_password__when_json_body_have_password_incorrect(self):
+        json_body_invalid_password = {"email": self.user.email, "password": "xxx"}
+        response = self.client.post(path='/login/', data=json_body_invalid_password, format='json')
+        self.assertEqual(response.data, DEFAULT_ERROR_MESSAGES['invalid_password'])
+
+    def test_return_invalid_email__when_json_body_have_email_incorrect(self):
+        json_body_invalid_email = {"email": "email@email.com", "password": self.user.password}
+        response = self.client.post(path='/login/', data=json_body_invalid_email, format='json')
+        self.assertEqual(response.data, DEFAULT_ERROR_MESSAGES['invalid_email'])
 
     def test_generated_token_works_when_login_is_done(self):
         user_jwt_secret = str(self.user.jwt_secret)

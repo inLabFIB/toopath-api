@@ -8,7 +8,7 @@ from rest_framework_jwt.settings import api_settings
 from TooPath3.constants import DEFAULT_ERROR_MESSAGES
 from TooPath3.locations.views import *
 from TooPath3.models import Device, CustomUser, TrackLocation
-from TooPath3.utils import generate_token_for_testing, get_latest_id_inserted, create_user_with_email, \
+from TooPath3.utils import generate_token_for_user, get_latest_id_inserted, create_user_with_email, \
     create_device_with_owner, create_track_with_device
 
 
@@ -16,7 +16,7 @@ class GetActualLocation(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = create_user_with_email(email='user_test@gmail.com')
-        self.token = generate_token_for_testing(user=self.user)
+        self.token = generate_token_for_user(user=self.user)
         self.device = create_device_with_owner(owner=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
@@ -49,7 +49,7 @@ class PutActualLocationCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = create_user_with_email(email='user_test@gmail.com')
-        self.token = generate_token_for_testing(user=self.user)
+        self.token = generate_token_for_user(user=self.user)
         self.device = create_device_with_owner(owner=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
@@ -111,7 +111,7 @@ class PostTrackLocationCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = create_user_with_email('user_test')
-        self.token = generate_token_for_testing(self.user)
+        self.token = generate_token_for_user(self.user)
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
 
     def test_return_404_when_device_not_exists(self):
