@@ -63,6 +63,7 @@ class UserLogin(APIView):
                 return Response(data=DEFAULT_ERROR_MESSAGES['invalid_email'], status=HTTP_400_BAD_REQUEST)
             if not user.check_password(serializer.validated_data['password']):
                 return Response(data=DEFAULT_ERROR_MESSAGES['invalid_password'], status=HTTP_400_BAD_REQUEST)
-            response_data = {'token': generate_token_for_user(user)}
+            serializer = PublicCustomUserSerializer(instance=user)
+            response_data = {"token": generate_token_for_user(user), "user": serializer.data}
             return Response(data=response_data, status=HTTP_200_OK)
         return Response(data=serializer.errors, status=HTTP_400_BAD_REQUEST)
