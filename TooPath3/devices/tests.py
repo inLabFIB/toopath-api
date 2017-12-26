@@ -3,28 +3,8 @@ from rest_framework.test import APITestCase, APIClient
 from rest_framework_jwt.serializers import jwt_decode_handler, jwt_get_username_from_payload
 
 from TooPath3.devices.serializers import DeviceSerializer
-from TooPath3.models import ActualLocation
 
 from TooPath3.utils import *
-
-VALID_DATA_POST_DEVICE = {
-    "name": "test",
-    "ip_address": "127.0.0.1",
-    "port_number": 8000,
-    "device_type": "ad",
-    "device_privacy": "pr"
-}
-INVALID_DATA_POST_DEVICE = {
-    "nam": "test",
-    "privacy": "pr"
-}
-VALID_DATA_PUT_DEVICE = {
-    "ip_address": "127.0.0.1",
-    "port_number": 8000
-}
-INVALID_DATA_PUT_DEVICE = {
-    "naa": "name"
-}
 
 
 class GetDeviceCase(APITestCase):
@@ -139,6 +119,36 @@ class PutDeviceCase(APITestCase):
         device_updated = Device.objects.get(pk=device.did)
         expected_ip_address = "127.0.0.1"
         self.assertEqual(expected_ip_address, device_updated.ip_address)
+
+
+class DeleteDeviceCase(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = create_user_with_email('test@gmail.com')
+        self.token = generate_token_for_user(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
+
+    def test_return_no_content_status__when_delete_is_done(self):
+        device = create_device_with_owner(owner=self.user)
+        track=create_track_with_device(device=device)
+        create_track_location_with_track(track=track)
+        response = self.client.delete(path='/devices/' + str(device.did) + '/')
+        self.assertEqual(response.status_code, HTTP_204_NO_CONTENT)
+
+    def test_return_not_found_status_when__device_does_not_exists(self):
+        response = self.client.delete(path='/devices/100/')
+        self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
+
+    def test_return_unauthorized_status__when_user_not_authenticated(self):
+        self.client.credentials(HTTP_AUTHORIZATION='')
+        response = self.client.get(path='/devices/100/')
+        self.assertEqual(response.status_code, HTTP_401_UNAUTHORIZED)
+
+    def test_return_forbidden_status__when_request_user_is_not_owner(self):
+        owner = create_user_with_email(email='test999@gmail.com')
+        device = create_device_with_owner(owner=owner)
+        response = self.client.delete(path='/devices/' + str(device.did) + '/')
+        self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
 
 
 class GetDevicesCase(APITestCase):

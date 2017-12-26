@@ -163,7 +163,6 @@ class PostTrackLocationCase(APITestCase):
                                     json_body)
         expected_json = TrackLocationSerializer(
             self._get_track_location_by_id(get_latest_id_inserted(TrackLocation))).data
-        print(response.data)
         self.assertEqual(expected_json, response.data)
 
     def test_return_invalid_latitude_error_when_body_has_invalid_latitude(self):
