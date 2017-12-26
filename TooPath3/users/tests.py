@@ -149,6 +149,35 @@ class PutUserCase(APITestCase):
         self.assertEqual(PublicCustomUserSerializer(instance=user_updated).data, response.data)
 
 
+class DeleteUserCase(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_return_no_content_status__when_delete_is_done(self):
+        user = create_user_with_email('test@gmail.com')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + generate_token_for_user(user))
+        response = self.client.delete(path='/users/' + str(user.pk) + '/')
+        self.assertEqual(response.status_code, HTTP_204_NO_CONTENT)
+
+    def test_return_not_found_status_when__user_does_not_exists(self):
+        user = create_user_with_email('test777@gmail.com')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + generate_token_for_user(user))
+        response = self.client.delete(path='/users/100/')
+        self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
+
+    def test_return_unauthorized_status__when_user_not_authenticated(self):
+        self.client.credentials(HTTP_AUTHORIZATION='')
+        response = self.client.get(path='/devices/100/')
+        self.assertEqual(response.status_code, HTTP_401_UNAUTHORIZED)
+
+    def test_return_forbidden_status__when_request_user_is_not_owner(self):
+        user = create_user_with_email(email='test999@gmail.com')
+        user2 = create_user_with_email('test888@gmail.com')
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + generate_token_for_user(user2))
+        response = self.client.delete(path='/users/' + str(user.pk) + '/')
+        self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
+
+
 class LoginTestCase(APITestCase):
     class PayloadObject:
         def __init__(self, username, pk):
