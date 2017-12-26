@@ -9,7 +9,7 @@ from TooPath3.constants import DEFAULT_ERROR_MESSAGES
 from TooPath3.locations.views import *
 from TooPath3.models import Device, CustomUser, TrackLocation
 from TooPath3.utils import generate_token_for_user, get_latest_id_inserted, create_user_with_email, \
-    create_device_with_owner, create_track_with_device
+    create_device_with_owner, create_track_with_device, create_track_location_with_track
 
 
 class GetActualLocation(APITestCase):
@@ -107,6 +107,42 @@ class PutActualLocationCase(APITestCase):
         self.assertEqual(response.data, {'non_field_errors': ['Enter a valid longitude.']})
 
 
+class DeleteTrackCase(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = create_user_with_email('test@gmail.com')
+        self.token = generate_token_for_user(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
+
+    def test_return_no_content_status__when_delete_is_done(self):
+        device = create_device_with_owner(owner=self.user)
+        track = create_track_with_device(device=device)
+        track_location = create_track_location_with_track(track=track)
+        response = self.client.delete(
+            path='/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/locations/' + str(
+                track_location.id) + '/')
+        self.assertEqual(response.status_code, HTTP_204_NO_CONTENT)
+
+    def test_return_not_found_status_when__location_does_not_exists(self):
+        response = self.client.delete(path='/devices/100/tracks/100/locations/100/')
+        self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
+
+    def test_return_unauthorized_status__when_user_not_authenticated(self):
+        self.client.credentials(HTTP_AUTHORIZATION='')
+        response = self.client.get(path='/devices/100/tracks/100/locations/')
+        self.assertEqual(response.status_code, HTTP_401_UNAUTHORIZED)
+
+    def test_return_forbidden_status__when_request_user_is_not_owner(self):
+        owner = create_user_with_email(email='test999@gmail.com')
+        device = create_device_with_owner(owner=owner)
+        track = create_track_with_device(device=device)
+        track_location = create_track_location_with_track(track=track)
+        response = self.client.delete(
+            path='/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/locations/' + str(
+                track_location.id) + '/')
+        self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
+
+
 class PostTrackLocationCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
@@ -117,24 +153,24 @@ class PostTrackLocationCase(APITestCase):
     def test_return_404_when_device_not_exists(self):
         device = create_device_with_owner(self.user)
         track = create_track_with_device(device)
-        response = self.client.post('/devices/100/tracks/' + str(track.tid) + '/trackLocations/', {})
+        response = self.client.post('/devices/100/tracks/' + str(track.tid) + '/locations/', {})
         self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
 
     def test_return_404_when_track_not_exists(self):
         device = create_device_with_owner(self.user)
-        response = self.client.post('/devices/' + str(device.did) + '/tracks/100/trackLocations/', {})
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/100/locations/', {})
         self.assertEqual(HTTP_404_NOT_FOUND, response.status_code)
 
     def test_return_401_status_when_user_is_not_authenticated(self):
         self.client.credentials(HTTP_AUTHORIZATION='')
-        response = self.client.post('/devices/100/tracks/100/trackLocations/', {})
+        response = self.client.post('/devices/100/tracks/100/locations/', {})
         self.assertEqual(HTTP_401_UNAUTHORIZED, response.status_code)
 
     def test_return_403_status_when_user_has_not_permissions(self):
         owner = create_user_with_email('owner')
         device = create_device_with_owner(owner)
         track = create_track_with_device(device)
-        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/locations/',
                                     {})
         self.assertEqual(HTTP_403_FORBIDDEN, response.status_code)
 
@@ -142,7 +178,7 @@ class PostTrackLocationCase(APITestCase):
         device = create_device_with_owner(self.user)
         track = create_track_with_device(device)
         json_body = {'point': {'type': 'Point', 'coordinates': [90, 90]}}
-        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/locations/',
                                     json_body)
         self.assertEqual(HTTP_201_CREATED, response.status_code)
 
@@ -150,7 +186,7 @@ class PostTrackLocationCase(APITestCase):
         device = create_device_with_owner(self.user)
         track = create_track_with_device(device)
         json_body = {'point': {'type': 'Point', 'coordinates': [90, 90]}}
-        self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
+        self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/locations/',
                          json_body)
         track_location = self._get_track_location_by_id(get_latest_id_inserted(TrackLocation))
         self.assertIsNotNone(track_location)
@@ -159,7 +195,7 @@ class PostTrackLocationCase(APITestCase):
         device = create_device_with_owner(self.user)
         track = create_track_with_device(device)
         json_body = {'point': {'type': 'Point', 'coordinates': [90, 90]}}
-        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/locations/',
                                     json_body)
         expected_json = TrackLocationSerializer(
             self._get_track_location_by_id(get_latest_id_inserted(TrackLocation))).data
@@ -169,7 +205,7 @@ class PostTrackLocationCase(APITestCase):
         device = create_device_with_owner(self.user)
         track = create_track_with_device(device)
         json_body = {'point': {'type': 'Point', 'coordinates': [91, 90]}}
-        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/locations/',
                                     json_body)
         expected_json = {'non_field_errors': [DEFAULT_ERROR_MESSAGES['invalid_latitude']]}
         self.assertEqual(expected_json, response.data)
@@ -178,7 +214,7 @@ class PostTrackLocationCase(APITestCase):
         device = create_device_with_owner(self.user)
         track = create_track_with_device(device)
         json_body = {'point': {'type': 'Point', 'coordinates': [1, 181]}}
-        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/trackLocations/',
+        response = self.client.post('/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/locations/',
                                     json_body)
         expected_json = {'non_field_errors': [DEFAULT_ERROR_MESSAGES['invalid_longitude']]}
         self.assertEqual(expected_json, response.data)

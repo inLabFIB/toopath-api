@@ -14,4 +14,6 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         # Write permissions are only allowed to the owner of the device.
         if hasattr(obj, 'device'):
             return obj.device.owner == request.user
+        if hasattr(obj, 'track'):
+            return obj.track.device.owner == request.user
         return obj.owner == request.user

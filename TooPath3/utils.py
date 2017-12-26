@@ -45,7 +45,7 @@ def create_track_with_device(device):
 
 
 def create_track_location_with_track(track):
-    TrackLocation.objects.create(point=Point(44, 67), track=track)
+    return TrackLocation.objects.create(point=Point(44, 67), track=track)
 
 
 def create_various_track_locations_with_track(track):
