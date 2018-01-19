@@ -3,12 +3,12 @@
 [![Code coverage][shield-coverage]](#)
 [![Requirements][shield-requirements]](#)
 [![MIT licensed][shield-license]](#)
-
-
+[![Last stable version][shield-version]](#)
 
 [shield-coverage]: https://img.shields.io/badge/coverage-100%25-brightgreen.svg
 [shield-license]: https://img.shields.io/badge/license-MIT-blue.svg
 [shield-requirements]: https://img.shields.io/badge/requirements-up--to--date-brightgreen.svg
+[shield-version]: https://img.shields.io/badge/last%20stable%20version-0.3.0-green.svg
 
 TooPath v3 is an API that let you manage tracks and locations related to a device. This API is protected with [JWT](https://jwt.io/) authentication and follows the [GeoJSON](http://geojson.org/) RFC 7946.
 
