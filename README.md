@@ -1,6 +1,16 @@
 # TooPath v3
 
-TooPath is an API that let you manage tracks and locations related to a device.
+[![Code coverage][shield-coverage]](#)
+[![Requirements][shield-requirements]](#)
+[![MIT licensed][shield-license]](#)
+
+
+
+[shield-coverage]: https://img.shields.io/badge/coverage-100%25-brightgreen.svg
+[shield-license]: https://img.shields.io/badge/license-MIT-blue.svg
+[shield-requirements]: https://img.shields.io/badge/requirements-up--to--date-brightgreen.svg
+
+TooPath v3 is an API that let you manage tracks and locations related to a device. This API is protected with [JWT](https://jwt.io/) authentication and follows the [GeoJSON](http://geojson.org/) RFC 7946.
 
 ## Getting Started
 
@@ -11,7 +21,7 @@ These instructions will get you a copy of the project up and running on your loc
 * Install **[python 3.6.1](https://www.python.org/downloads/)**.
 * Install **OSGeo4W** following the steps in **[GeoDjango Tutorial](https://docs.djangoproject.com/en/2.0/ref/contrib/gis/tutorial/)** (make sure to install the same bit version of python and OSGeo4W.
 * Install **[PyCharm](https://www.jetbrains.com/pycharm/download/)** (optional, recommended for windows users).
-
+ 
 #### Windows
 
 * Install **[virtualenvwrapper-win](https://pypi.python.org/pypi/virtualenvwrapper-win)** via ```easy_install virtualenvwrapper-win```
@@ -69,7 +79,7 @@ python manage.py migrate
 Use ```python manage.py runserver x.x.x.x:aaaa``` where x.x.x.x is the address and aaaa is the port. For local example:
 
 ```
-python manage.py runserver 127.0.0.1:8080
+python manage.py runserver 127.0.0.1:8080 
 ```
 
 ## Running the tests
@@ -114,7 +124,7 @@ Youn can also setup the **DJANGO_SETTINGS_MODULE** environment variable to ```To
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/AlbertWayne/TooPath/tags).
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/AlbertWayne/TooPath/tags). 
 
 ## License
 
