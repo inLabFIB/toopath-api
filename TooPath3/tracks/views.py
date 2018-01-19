@@ -69,3 +69,9 @@ class TrackDetail(APIView):
             track_partial_updated = serializer.save()
             return Response(TrackSerializer(track_partial_updated).data, status=HTTP_200_OK)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, d_pk, t_pk):
+        self.get_object(pk=d_pk, model_class=Device)
+        track = self.get_object(pk=t_pk, model_class=Track)
+        track.delete()
+        return Response(status=HTTP_204_NO_CONTENT)

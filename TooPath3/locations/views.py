@@ -8,7 +8,7 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from TooPath3.devices.permissions import IsOwnerOrReadOnly
 from TooPath3.locations.serializers import ActualLocationSerializer, TrackLocationSerializer
-from TooPath3.models import ActualLocation, Track, Device
+from TooPath3.models import ActualLocation, Track, Device, TrackLocation
 
 
 class DeviceActualLocation(APIView):
@@ -33,6 +33,23 @@ class DeviceActualLocation(APIView):
             actual_location_updated = serializer.save()
             return Response(data=ActualLocationSerializer(instance=actual_location_updated).data, status=HTTP_200_OK)
         return Response(data=serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+
+class TrackLocationDetail(APIView):
+    authentication_classes = (JSONWebTokenAuthentication, SessionAuthentication, BasicAuthentication,)
+    permission_classes = (IsAuthenticated, IsOwnerOrReadOnly,)
+
+    def get_object(self, pk, model_class):
+        obj = get_object_or_404(model_class, pk=pk)
+        self.check_object_permissions(self.request, obj=obj)
+        return obj
+
+    def delete(self, request, d_pk, t_pk, l_pk):
+        self.get_object(pk=d_pk, model_class=Device)
+        self.get_object(pk=t_pk, model_class=Track)
+        track_location = self.get_object(pk=l_pk, model_class=TrackLocation)
+        track_location.delete()
+        return Response(status=HTTP_204_NO_CONTENT)
 
 
 class TrackLocationList(APIView):

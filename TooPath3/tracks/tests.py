@@ -168,6 +168,36 @@ class PutTrackCase(APITestCase):
         self.assertEqual(TrackSerializer(track_updated).data, response.data)
 
 
+class DeleteTrackCase(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = create_user_with_email('test@gmail.com')
+        self.token = generate_token_for_user(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + self.token)
+
+    def test_return_no_content_status__when_delete_is_done(self):
+        device = create_device_with_owner(owner=self.user)
+        track = create_track_with_device(device=device)
+        response = self.client.delete(path='/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/')
+        self.assertEqual(response.status_code, HTTP_204_NO_CONTENT)
+
+    def test_return_not_found_status_when__device_does_not_exists(self):
+        response = self.client.delete(path='/devices/100/tracks/100/')
+        self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
+
+    def test_return_unauthorized_status__when_user_not_authenticated(self):
+        self.client.credentials(HTTP_AUTHORIZATION='')
+        response = self.client.get(path='/devices/100/tracks/100/')
+        self.assertEqual(response.status_code, HTTP_401_UNAUTHORIZED)
+
+    def test_return_forbidden_status__when_request_user_is_not_owner(self):
+        owner = create_user_with_email(email='test999@gmail.com')
+        device = create_device_with_owner(owner=owner)
+        track = create_track_with_device(device=device)
+        response = self.client.delete(path='/devices/' + str(device.did) + '/tracks/' + str(track.tid) + '/')
+        self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
+
+
 class GetTracksCase(APITestCase):
     def setUp(self):
         self.client = APIClient()

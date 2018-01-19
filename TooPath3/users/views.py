@@ -43,6 +43,11 @@ class UserDetail(APIView):
             return Response(data=PublicCustomUserSerializer(user_updated).data, status=HTTP_200_OK)
         return Response(data=serializer.errors, status=HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, u_pk):
+        user = self.get_object(pk=u_pk)
+        user.delete()
+        return Response(status=HTTP_204_NO_CONTENT)
+
 
 class UserList(APIView):
     def post(self, request):
