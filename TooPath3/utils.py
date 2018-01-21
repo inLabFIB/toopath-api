@@ -1,7 +1,7 @@
 from django.contrib.auth.hashers import make_password
 from django.contrib.gis.geos import Point
+import requests
 from rest_framework_jwt.settings import api_settings
-
 from TooPath3.models import CustomUser, Device, Track, TrackLocation
 
 
@@ -53,3 +53,16 @@ def create_various_track_locations_with_track(track):
     while count < 5:
         create_track_location_with_track(track)
         count += 1
+
+
+def validate_google_token(token):
+    params = {'id_token': token}
+    return requests.post('https://www.googleapis.com/oauth2/v3/tokeninfo', params=params)
+
+
+def generate_user_info_from_google(email, name):
+    return {'email': email,
+            'username': email.split('@')[0],
+            'password': make_password(email.split('@')[0]),
+            'first_name': name.split()[0],
+            'last_name': name.split()[1]}

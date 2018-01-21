@@ -9,5 +9,7 @@ DEFAULT_ERROR_MESSAGES = {
     'patch_device_fields_required': _('You must provide a valid fields to update the Device instance'),
     'patch_user_fields_required': _('You must provide a valid fields to update the User instance'),
     'invalid_email': _('The email provided is incorrect'),
-    'invalid_password': _('The password provided is incorrect')
+    'invalid_password': _('The password provided is incorrect'),
+    'invalid_google_token': _('The google token is invalid')
+
 }

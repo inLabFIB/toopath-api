@@ -9,8 +9,9 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from TooPath3.constants import DEFAULT_ERROR_MESSAGES
 from TooPath3.devices.permissions import IsOwnerOrReadOnly
 from TooPath3.models import CustomUser
-from TooPath3.users.serializers import CustomUserSerializer, PublicCustomUserSerializer, LoginSerializer
-from TooPath3.utils import generate_token_for_user
+from TooPath3.users.serializers import CustomUserSerializer, PublicCustomUserSerializer, LoginSerializer, \
+    GoogleLoginSerializer
+from TooPath3.utils import generate_token_for_user, validate_google_token, generate_user_info_from_google
 
 
 class UserDetail(APIView):
@@ -71,4 +72,28 @@ class UserLogin(APIView):
             serializer = PublicCustomUserSerializer(instance=user)
             response_data = {"token": generate_token_for_user(user), "user": serializer.data}
             return Response(data=response_data, status=HTTP_200_OK)
+        return Response(data=serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+
+class UserGoogleLogIn(APIView):
+    def post(self, request):
+        serializer = GoogleLoginSerializer(data=request.data)
+        if serializer.is_valid():
+            response = validate_google_token(serializer.validated_data['google_token'])
+            if response.status_code == 200:
+                try:
+                    user = CustomUser.objects.get(email=serializer.validated_data['email'])
+                except CustomUser.DoesNotExist:
+                    user_info = generate_user_info_from_google(email=serializer.validated_data['email'],
+                                                               name=serializer.validated_data['name'])
+                    serializer = CustomUserSerializer(data=user_info)
+                    if serializer.is_valid():
+                        user = serializer.save()
+                    else:
+                        return Response(data=serializer.errors, status=HTTP_400_BAD_REQUEST)
+                serializer = PublicCustomUserSerializer(instance=user)
+                response_data = {"token": generate_token_for_user(user), "user": serializer.data}
+                return Response(data=response_data, status=HTTP_200_OK)
+            else:
+                return Response(data=DEFAULT_ERROR_MESSAGES['invalid_google_token'], status=HTTP_400_BAD_REQUEST)
         return Response(data=serializer.errors, status=HTTP_400_BAD_REQUEST)

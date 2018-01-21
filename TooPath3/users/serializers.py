@@ -31,3 +31,9 @@ class PublicCustomUserSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(required=True)
+
+
+class GoogleLoginSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    google_token = serializers.CharField(required=True)
+    name = serializers.CharField()
