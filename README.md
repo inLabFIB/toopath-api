@@ -8,7 +8,7 @@
 [shield-coverage]: https://img.shields.io/badge/coverage-100%25-brightgreen.svg
 [shield-license]: https://img.shields.io/badge/license-MIT-blue.svg
 [shield-requirements]: https://img.shields.io/badge/requirements-up--to--date-brightgreen.svg
-[shield-version]: https://img.shields.io/badge/last%20stable%20version-v0.3.0-green.svg
+[shield-version]: https://img.shields.io/badge/last%20stable%20version-v1.0.0-green.svg
 
 TooPath v3 is an API that let you manage tracks and locations related to a device. This API is protected with [JWT](https://jwt.io/) authentication and follows the [GeoJSON](http://geojson.org/) RFC 7946.
 
@@ -67,7 +67,7 @@ Docker users should build image and run a container using:
 
 ```
 docker build -t toopath/postgres .
-sudo docker run --name postgres -p 15432:5432 toopath/postgres
+docker run --name postgres -p 15432:5432 toopath/postgres
 ```
 
 Of course, manual configuration is available, you can create the database with the **PostgreSQL** and **PostGIS** versions mentioned above.
