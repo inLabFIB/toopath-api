@@ -17,5 +17,5 @@ Vagrant::Config.run do |config|
   config.vm.box_url = "https://atlas.hashicorp.com/ubuntu/boxes/trusty64"
   config.vm.host_name = "toopath"
   config.vm.share_folder "bootstrap", "/mnt/bootstrap", ".", :create => true
-  config.vm.provision :shell, :path => "Vagrant-setup/bootstrap.sh"
+  config.vm.provision :shell, :path => "bootstrap.sh"
 end

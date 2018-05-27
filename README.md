@@ -16,6 +16,19 @@ TooPath v3 is an API that let you manage tracks and locations related to a devic
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
+### Docker image
+
+If you only want to run TooPath you can use the available Docker image, after setting up [Database](####Database setup
+) you can do:
+
+```
+docker build -t toopath .
+docker run --name toopath --net=host -p 8080:8080 toopath
+
+```
+
+And a working instance of TooPath will be available on port 8080.
+
 ### Prerequisites
 
 * Install **[python 3.6.1](https://www.python.org/downloads/)**.
@@ -66,6 +79,7 @@ For those who prefer to use Vagrant, follow this **[Getting started of Vagrant](
 Docker users should build image and run a container using:
 
 ```
+cd bootstrap
 docker build -t toopath/postgres .
 docker run --name postgres -p 15432:5432 toopath/postgres
 ```
@@ -121,7 +135,7 @@ To start the API on the production enviroment use:
 python manage.py runserver x.x.x.x:aaaa --settings=TooPath3.settings.production
 ```
 
-Youn can also setup the **DJANGO_SETTINGS_MODULE** environment variable to ```TooPath3.settings.production```.
+You can also setup the **DJANGO_SETTINGS_MODULE** environment variable to ```TooPath3.settings.production```.
 
 ## Built With
 
