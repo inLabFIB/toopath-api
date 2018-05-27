@@ -20,7 +20,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 * Install **[python 3.6.1](https://www.python.org/downloads/)**.
 * Install **OSGeo4W** following the steps in **[GeoDjango Tutorial](https://docs.djangoproject.com/en/2.0/ref/contrib/gis/tutorial/)** (make sure to install the same bit version of python and OSGeo4W.
-* Install **[PyCharm](https://www.jetbrains.com/pycharm/download/)** (optional, recommended for windows users).
+* Install **[PyCharm](https://www.jetbrains.com/pycharm/download/)** (optional, recommended for Windows users).
  
 #### Windows
 
@@ -57,9 +57,20 @@ pip install -r requirements.txt
 
 As it is recommended on this **[settings tutorial](https://medium.com/@ayarshabeer/django-best-practice-settings-file-for-multiple-environments-6d71c6966ee2)**, this project has production and local separate settings. To use the local settings setup your **DJANGO_SETTINGS_MODULE** environment variable to ```TooPath3.settings.local```.
 
-For windows users, follow this **[Getting started of Vagrant](https://www.vagrantup.com/intro/getting-started/index.html)** to create a virtual machine with **PostgreSQL** and **PostGIS** (use the versions on [Linux](#Linux) section).
+#### Database setup
 
-For linux users, you can create the database with the **PostgreSQL** and **PostGIS** previously installed.
+There is a **Vagrant** file and a **Docker** image with **PostgreSQL** and **PostGIS** installed and configured with local settings.
+
+For those who prefer to use Vagrant, follow this **[Getting started of Vagrant](https://www.vagrantup.com/intro/getting-started/index.html)** to create a virtual machine with.
+
+Docker users should build image and run a container using:
+
+```
+docker build -t toopath/postgres .
+sudo docker run --name postgres -p 15432:5432 toopath/postgres
+```
+
+Of course, manual configuration is available, you can create the database with the **PostgreSQL** and **PostGIS** versions mentioned above.
 
 Apply all the migrations with:
 
