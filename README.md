@@ -18,8 +18,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Docker image
 
-If you only want to run TooPath you can use the available Docker image, after setting up [Database](####Database setup
-) you can do:
+If you only want to run TooPath you can use the available Docker image, after setting up database (see *Database section* below) you can do:
 
 ```
 docker build -t toopath .
