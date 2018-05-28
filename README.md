@@ -21,11 +21,13 @@ These instructions will get you a copy of the project up and running on your loc
 If you only want to run TooPath you can use the available Docker image, after setting up database (see *Database section* below) you can do:
 
 ```
-docker build -t toopath .
-docker run --name toopath --network toopathnetwork -p 8080:8080 toopath
+docker build -t toopath/api .
+docker run --name toopath --network toopathnetwork -p 8080:8080 toopath/api
 ```
 
 And a working instance of TooPath will be available on port 8080.
+
+Network flag is required to connect this container to database container.
 
 ### Prerequisites
 
@@ -70,11 +72,11 @@ As it is recommended on this **[settings tutorial](https://medium.com/@ayarshabe
 
 #### Database setup
 
-There is a **Vagrant** file and a **Docker** image with **PostgreSQL** and **PostGIS** installed and configured with local settings.
+There is a **Vagrant** file and a **Docker** file with **PostgreSQL** and **PostGIS** installed and configured with local settings.
 
 For those who prefer to use Vagrant, follow this **[Getting started of Vagrant](https://www.vagrantup.com/intro/getting-started/index.html)** to create a virtual machine with.
 
-Docker users should build image and run a container using:
+Docker users should build image and run a container using (network flag is required to connect this container to TooPath container):
 
 ```
 cd bootstrap
