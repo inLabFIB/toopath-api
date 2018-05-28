@@ -1,0 +1,1468 @@
+openapi: 3.0.0
+servers:
+  - url: 'http://127.0.0.1:8000/'
+info:
+  version: 1.0.0
+  title: TooPath
+  description: TooPath is a device tracking software offered as a service.
+  contact:
+    email: albert.diaz.benitez@fib.upc.edu
+  license:
+    name: MIT License
+    url: 'https://opensource.org/licenses/MIT'
+tags:
+  - name: users
+    description: petitions for the user management
+  - name: login
+    description: petitions for login
+  - name: token
+    description: petitions to manage tokens
+  - name: devices
+    description: petitions to manage devices
+  - name: track
+    description: petitions to manage tracks
+  - name: track location
+    description: petitions to manage the tracks locations
+  - name: actual location
+    description: petitions to manage the actual location of a device
+paths:
+  /devices/:
+    get:
+      tags:
+        - devices
+      summary: Get all the user devices
+      description: >-
+        Petition to retrieve all the devices instances associated with the user
+        identified by the JWT
+      security:
+        - JWT: []
+      responses:
+        '200':
+          description: devices information retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        '403':
+          description: Forbidden resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+    post:
+      tags:
+        - devices
+      summary: Create a new device
+      description: >-
+        Petition to create a device instance with all the fields passed on the
+        body and associated with the user identified by the JWT
+      security:
+        - JWT: []
+      responses:
+        '200':
+          description: device created succesfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceResponse'
+        '400':
+          description: Bad Request due to invalid body or fields format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        '403':
+          description: Forbidden resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        '409':
+          description: Resource conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error409'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Device'
+        description: User info
+        required: true
+  '/devices/{deviceId}/':
+    get:
+      tags:
+        - devices
+      summary: Get device info
+      description: >-
+        Petition to retrieve the device instance associated with the user
+        identified by the JWT and identified by the ID on the URL
+      security:
+        - JWT: []
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID of device to retrieve
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Device information retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        '403':
+          description: Forbidden resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+    put:
+      tags:
+        - devices
+      summary: Change representation of a device
+      description: >-
+        Petition to change the representation of the device associated with the
+        user identified by the JWT and identified by the ID on the URL
+      security:
+        - JWT: []
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID of device to change the representation
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '201':
+          description: Device representation changed succesfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceResponse'
+        '400':
+          description: Bad Request due to invalid body or fields format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        '403':
+          description: Forbidden resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Device'
+        description: Device representation to change
+        required: true
+    patch:
+      tags:
+        - devices
+      summary: Update fields of a device
+      description: >-
+        Petition to update or change fields of the device instance associated
+        with the user identified by the JWT and identified by the ID on the URL
+      security:
+        - JWT: []
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID of device to update fields
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '201':
+          description: Device updated succesfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceResponse'
+        '400':
+          description: Bad Request due to invalid body or fields format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        '403':
+          description: Forbidden resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Device'
+        description: Device fields to update
+        required: true
+    delete:
+      tags:
+        - devices
+      summary: Delete a device instance
+      description: >-
+        This petition allow to delete the device instance identified by the ID
+        located on the URL
+      security:
+        - JWT: []
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID of device to be deleted
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Device deleted succesfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        '403':
+          description: Forbidden resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+  '/devices/{deviceId}/actualLocation/':
+    get:
+      tags:
+        - actual location
+      summary: Retrieve the Actual Location of a device
+      description: >-
+        Petition to retrieve the actual location instance associated with the
+        device identified by the ID on the URL
+      security:
+        - JWT: []
+      parameters:
+        - name: deviceId
+          in: path
+          description: device ID of the actual location
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Actual Location retrieved succesfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActualLocationResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        '403':
+          description: Forbidden resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+    put:
+      tags:
+        - actual location
+      summary: Change representation of the actual location of a device
+      description: >-
+        Petition to change representation of the actual location associated with
+        the device identified by the ID on the URL
+      security:
+        - JWT: []
+      parameters:
+        - name: deviceId
+          in: path
+          description: device ID of the actual location
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Actual Location representation changed succesfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActualLocationResponse'
+        '400':
+          description: Bad Request due to invalid body or fields format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        '403':
+          description: Forbidden resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActualLocation'
+        description: New Actual Location representation info
+        required: true
+  '/devices/{deviceId}/tracks/':
+    get:
+      tags:
+        - track
+      summary: Get all the tracks of a device
+      description: >-
+        Petition to retrieve all the tracks instance associated with the device
+        identified by the ID on the URL
+      security:
+        - JWT: []
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID of device to return tracks
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Tracks information retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TrackResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        '403':
+          description: Forbidden resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+    post:
+      tags:
+        - track
+      summary: Create a new track
+      description: >-
+        Petition to retrieve all the tracks instance associated with the device
+        identified by the ID on the URL
+      security:
+        - JWT: []
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID of device to return tracks
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '201':
+          description: Track created succesfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackResponse'
+        '400':
+          description: Bad Request due to invalid body or fields format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        '403':
+          description: Forbidden resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+        '409':
+          description: Resource conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error409'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Track'
+        description: User info
+        required: true
+  '/devices/{deviceId}/tracks/{trackId}/':
+    get:
+      tags:
+        - track
+      summary: Get track information
+      description: >-
+        Petition to retrieve the track instance identified by the ID on the URL
+        associated with the device identified by the ID on the URL
+      security:
+        - JWT: []
+      parameters:
+        - name: deviceId
+          in: path
+          description: device ID of the track
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: trackId
+          in: path
+          description: ID of the track to retrieve
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '201':
+          description: Track info retrieved succesfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        '403':
+          description: Forbidden resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        '404':
+          description: Device or Track not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+    put:
+      tags:
+        - track
+      summary: Change representation of a track
+      description: >-
+        Petition to cahnge the representation of the track instance identified
+        by the ID on the URL associated with the device identified by the ID on
+        the URL
+      security:
+        - JWT: []
+      parameters:
+        - name: deviceId
+          in: path
+          description: device ID of the track
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: trackId
+          in: path
+          description: ID of the track to change the representation
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '201':
+          description: Track representation changed succesfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackResponse'
+        '400':
+          description: Bad Request due to invalid body or fields format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        '403':
+          description: Forbidden resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        '404':
+          description: Device or Track not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Track'
+        description: New track representation info
+        required: true
+    patch:
+      tags:
+        - track
+      summary: Update fields of a track
+      description: >-
+        Petition to update the fields of the track instance identified by the ID
+        on the URL associated with the device identified by the ID on the URL
+      security:
+        - JWT: []
+      parameters:
+        - name: deviceId
+          in: path
+          description: device ID of the track
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: trackId
+          in: path
+          description: ID of the track to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '201':
+          description: Track fields updated succesfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackResponse'
+        '400':
+          description: Bad Request due to invalid body or fields format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        '403':
+          description: Forbidden resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        '404':
+          description: Device or Track not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Track'
+        description: New track fields values info
+        required: true
+    delete:
+      tags:
+        - track
+      summary: Delete a track
+      description: >-
+        Petition to delete the track instance identified by the ID on the URL
+        associated with the device identified by the ID on the URL
+      security:
+        - JWT: []
+      parameters:
+        - name: deviceId
+          in: path
+          description: device ID of the track
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: trackId
+          in: path
+          description: ID of the track to be deleted
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Track deleted succesfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        '403':
+          description: Forbidden resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        '404':
+          description: Device or Track not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+  '/devices/{deviceId}/tracks/{trackId}/trackLocations/':
+    post:
+      tags:
+        - track location
+      summary: Create a new track location
+      description: >-
+        Petition to create the track location instance asociated on the track
+        identified by the ID on the URL associated with the device identified by
+        the ID on the URL
+      security:
+        - JWT: []
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID of device of the track
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: trackId
+          in: path
+          description: ID of the track to create the new track location
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '201':
+          description: Track Location created succesfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackLocationResponse'
+        '400':
+          description: Bad Request due to invalid body or fields format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        '403':
+          description: Forbidden resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        '404':
+          description: Device or Track not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrackLocation'
+        description: Track location info
+        required: true
+  '/devices/{deviceId}/tracks/{trackId}/trackLocations/{trackLocationId}':
+    put:
+      tags:
+        - track location
+      summary: Change the representation of the track location
+      description: >-
+        Petition to delete the track location instance asociated on the track
+        identified by the ID on the URL associated with the device identified by
+        the ID on the URL
+      security:
+        - JWT: []
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID of device of the track
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: trackId
+          in: path
+          description: ID of the track to update the new track location
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: trackLocationId
+          in: path
+          description: ID of the track location to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Track Location representation changed succesfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackLocationResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        '403':
+          description: Forbidden resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        '404':
+          description: 'Device, Track or Track Location not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+    delete:
+      tags:
+        - track location
+      summary: Delete a track location instance
+      description: >-
+        Petition to delete the track location instance asociated on the track
+        identified by the ID on the URL associated with the device identified by
+        the ID on the URL
+      security:
+        - JWT: []
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID of device of the track
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: trackId
+          in: path
+          description: ID of the track to delete the new track location
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: trackLocationId
+          in: path
+          description: ID of the track location to be deleted
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Track Location deleted succesfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        '403':
+          description: Forbidden resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        '404':
+          description: 'Device, Track or Track Location not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+  /users/:
+    post:
+      tags:
+        - users
+      summary: Create a new user
+      description: Petition to create the user instance with the info passed on the body
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: This field is required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        '409':
+          description: Resource conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error409'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        description: User info
+        required: true
+  '/users/{userId}/':
+    get:
+      tags:
+        - users
+      summary: Get information of the user
+      description: Petition to retrieve the user instance identified by the ID on the URL
+      security:
+        - JWT: []
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        '403':
+          description: Forbidden resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+    put:
+      tags:
+        - users
+      summary: Change representation of the user
+      description: >-
+        Petition to change the representation of the user instance identified by
+        the ID on the URL
+      security:
+        - JWT: []
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Representation changed succcesfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Bad Request due to invalid body or fields format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        '403':
+          description: Forbidden resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        description: User representation to be changed
+        required: true
+    patch:
+      tags:
+        - users
+      summary: Update user fields
+      description: >-
+        Petition to update the fields of the user instance identified by the ID
+        on the URL
+      security:
+        - JWT: []
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Fields updated succesfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Bad Request due to invalid body or fields format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        '403':
+          description: Forbidden resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        description: User fields to be updated
+        required: true
+    delete:
+      tags:
+        - users
+      summary: Delete user instance
+      description: Petition to delete the user instance identified by the ID on the URL
+      security:
+        - JWT: []
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: User deleted succesfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        '403':
+          description: Forbidden resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+  /login/:
+    post:
+      tags:
+        - login
+      summary: Log In into the API
+      description: Petition to log in to the API and retrieve the JWT
+      responses:
+        '200':
+          description: Log in succesful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: Unable to log in with provided credentials.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+        description: Login credentials
+        required: true
+  /login-google/:
+    post:
+      tags:
+        - login
+      summary: Log In into the API using a Google account
+      description: >-
+        Petition to log in using the Google account to the API and retrieve the
+        JWT
+      responses:
+        '200':
+          description: Log in succesful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: Unable to log in with provided credentials.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoogleLogin'
+        description: Google credentials
+        required: true
+  /api-token-refresh/:
+    post:
+      tags:
+        - token
+      summary: Refresh the JWT
+      description: Petition to refresh a JWT passed on the body
+      responses:
+        '200':
+          description: Token refreshed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+      requestBody:
+        $ref: '#/components/requestBodies/Body'
+  /api-token-verify/:
+    post:
+      tags:
+        - token
+      summary: Check if the JWT token is valid
+      description: Petition to check the validity of the JWT passed on the body
+      responses:
+        '200':
+          description: Token valid
+        '400':
+          description: Token not valid
+      requestBody:
+        $ref: '#/components/requestBodies/Body'
+components:
+  requestBodies:
+    Body:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+      description: Login credentials
+      required: true
+  securitySchemes:
+    JWT:
+      type: apiKey
+      name: Authorization
+      in: header
+  schemas:
+    Device:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        trash:
+          type: boolean
+        ip_address:
+          type: string
+        port_number:
+          type: integer
+        height:
+          type: number
+        speed:
+          type: number
+        heading:
+          type: number
+        utc:
+          type: string
+        device_privacy:
+          type: string
+        device_type:
+          type: string
+        device_imei:
+          type: string
+    Track:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+    TrackLocation:
+      type: object
+      properties:
+        point:
+          type: object
+          properties:
+            type:
+              type: string
+            coordinates:
+              type: array
+              items:
+                type: number
+                format: float
+                maxItems: 2
+                minItems: 2
+    ActualLocation:
+      type: object
+      properties:
+        point:
+          type: object
+          properties:
+            type:
+              type: string
+            coordinates:
+              type: array
+              items:
+                type: number
+                format: float
+                maxItems: 2
+                minItems: 2
+    Login:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    GoogleLogin:
+      type: object
+      properties:
+        email:
+          type: string
+        google-token:
+          type: string
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        password:
+          type: string
+    DeviceResponse:
+      type: object
+      properties:
+        did:
+          type: integer
+          format: int64
+        owner:
+          type: string
+        tracks:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrackResponse'
+        name:
+          type: string
+        description:
+          type: string
+        created_at:
+          type: string
+        updated_at:
+          type: string
+        trash:
+          type: boolean
+        ip_address:
+          type: string
+        port_number:
+          type: integer
+        height:
+          type: number
+        speed:
+          type: number
+        heading:
+          type: number
+        utc:
+          type: string
+        device_privacy:
+          type: string
+        device_type:
+          type: string
+        device_imei:
+          type: string
+    TrackResponse:
+      type: object
+      properties:
+        tid:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        device:
+          type: integer
+          format: int64
+        locations:
+          type: object
+          properties:
+            type:
+              type: string
+            features:
+              type: array
+              items:
+                $ref: '#/components/schemas/TrackLocationResponse'
+    TrackLocationResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        type:
+          type: string
+        geometry:
+          type: object
+          properties:
+            type:
+              type: string
+            coordinates:
+              type: array
+              items:
+                type: number
+                format: float
+                maxItems: 2
+                minItems: 2
+        properties:
+          type: object
+          properties:
+            created_at:
+              type: string
+            updated_at:
+              type: string
+            track:
+              type: integer
+              format: int64
+    ActualLocationResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        type:
+          type: string
+        geometry:
+          type: object
+          properties:
+            type:
+              type: string
+            coordinates:
+              type: array
+              items:
+                type: number
+                format: float
+                maxItems: 2
+                minItems: 2
+        properties:
+          type: object
+          properties:
+            created_at:
+              type: string
+            updated_at:
+              type: string
+            device:
+              type: integer
+              format: int64
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        email:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        date_joined:
+          type: string
+        last_login:
+          type: string
+    TokenResponse:
+      type: object
+      properties:
+        token:
+          type: string
+    Error403:
+      type: object
+      properties:
+        detail:
+          type: string
+    Error401:
+      type: object
+      properties:
+        detail:
+          type: string
+    Error400:
+      type: object
+      properties:
+        field_error:
+          type: string
+    Error404:
+      type: object
+      properties:
+        detail:
+          type: string
+    Error409:
+      type: object
+      properties:
+        detail:
+          type: string
