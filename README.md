@@ -22,8 +22,7 @@ If you only want to run TooPath you can use the available Docker image, after se
 
 ```
 docker build -t toopath .
-docker run --name toopath --net=host -p 8080:8080 toopath
-
+docker run --name toopath --network toopathnetwork -p 8080:8080 toopath
 ```
 
 And a working instance of TooPath will be available on port 8080.
@@ -80,7 +79,7 @@ Docker users should build image and run a container using:
 ```
 cd bootstrap
 docker build -t toopath/postgres .
-docker run --name postgres -p 15432:5432 toopath/postgres
+docker run --name postgres -p 5432:5432 --network toopathnetwork toopath/postgres
 ```
 
 Of course, manual configuration is available, you can create the database with the **PostgreSQL** and **PostGIS** versions mentioned above.
