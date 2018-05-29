@@ -22,6 +22,7 @@ If you only want to run TooPath you can use the available Docker image, after se
 
 ```
 docker build -t toopath/api .
+docker network create toopathnetwork
 docker run --name toopath --network toopathnetwork -p 8080:8080 toopath/api
 ```
 
