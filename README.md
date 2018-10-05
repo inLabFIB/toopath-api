@@ -8,7 +8,7 @@
 [shield-coverage]: https://img.shields.io/badge/coverage-100%25-brightgreen.svg
 [shield-license]: https://img.shields.io/badge/license-MIT-blue.svg
 [shield-requirements]: https://img.shields.io/badge/requirements-up--to--date-brightgreen.svg
-[shield-version]: https://img.shields.io/badge/last%20stable%20version-v0.3.0-green.svg
+[shield-version]: https://img.shields.io/badge/last%20stable%20version-v1.0.0-green.svg
 
 TooPath v3 is an API that let you manage tracks and locations related to a device. This API is protected with [JWT](https://jwt.io/) authentication and follows the [GeoJSON](http://geojson.org/) RFC 7946.
 
@@ -16,11 +16,24 @@ TooPath v3 is an API that let you manage tracks and locations related to a devic
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
+### Docker image
+
+If you only want to run TooPath you can use the available Docker image, after setting up database (see *Database section* below) you can do:
+
+```
+docker build -t toopath/api .
+docker run --name toopath --network toopathnetwork -p 8080:8080 toopath/api
+```
+
+And a working instance of TooPath will be available on port 8080.
+
+Network flag is required to connect this container to database container.
+
 ### Prerequisites
 
 * Install **[python 3.6.1](https://www.python.org/downloads/)**.
 * Install **OSGeo4W** following the steps in **[GeoDjango Tutorial](https://docs.djangoproject.com/en/2.0/ref/contrib/gis/tutorial/)** (make sure to install the same bit version of python and OSGeo4W.
-* Install **[PyCharm](https://www.jetbrains.com/pycharm/download/)** (optional, recommended for windows users).
+* Install **[PyCharm](https://www.jetbrains.com/pycharm/download/)** (optional, recommended for Windows users).
  
 #### Windows
 
@@ -57,9 +70,21 @@ pip install -r requirements.txt
 
 As it is recommended on this **[settings tutorial](https://medium.com/@ayarshabeer/django-best-practice-settings-file-for-multiple-environments-6d71c6966ee2)**, this project has production and local separate settings. To use the local settings setup your **DJANGO_SETTINGS_MODULE** environment variable to ```TooPath3.settings.local```.
 
-For windows users, follow this **[Getting started of Vagrant](https://www.vagrantup.com/intro/getting-started/index.html)** to create a virtual machine with **PostgreSQL** and **PostGIS** (use the versions on [Linux](#Linux) section).
+#### Database setup
 
-For linux users, you can create the database with the **PostgreSQL** and **PostGIS** previously installed.
+There is a **Vagrant** file and a **Docker** file with **PostgreSQL** and **PostGIS** installed and configured with local settings.
+
+For those who prefer to use Vagrant, follow this **[Getting started of Vagrant](https://www.vagrantup.com/intro/getting-started/index.html)** to create a virtual machine with.
+
+Docker users should build image and run a container using (network flag is required to connect this container to TooPath container):
+
+```
+cd bootstrap
+docker build -t toopath/postgres .
+docker run --name postgres -p 5432:5432 --network toopathnetwork toopath/postgres
+```
+
+Of course, manual configuration is available, you can create the database with the **PostgreSQL** and **PostGIS** versions mentioned above.
 
 Apply all the migrations with:
 
@@ -110,7 +135,7 @@ To start the API on the production enviroment use:
 python manage.py runserver x.x.x.x:aaaa --settings=TooPath3.settings.production
 ```
 
-Youn can also setup the **DJANGO_SETTINGS_MODULE** environment variable to ```TooPath3.settings.production```.
+You can also setup the **DJANGO_SETTINGS_MODULE** environment variable to ```TooPath3.settings.production```.
 
 ## Built With
 
