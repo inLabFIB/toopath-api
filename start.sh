@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 python manage.py migrate --settings=TooPath3.settings.docker
 
 export DJANGO_SETTINGS_MODULE=TooPath3.settings.docker
