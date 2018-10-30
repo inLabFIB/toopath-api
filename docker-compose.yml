@@ -1,0 +1,23 @@
+version: '3'
+
+volumes:
+  pgdata:
+
+services:
+  api:
+    build: .
+    ports:
+    - "8080:8080"
+    depends_on:
+    - postgres
+    environment:
+    - DJANGO_SETTINGS_MODULE=TooPath3.settings.docker
+
+  postgres:
+    build: ./bootstrap
+    volumes:
+    - pgdata:/var/lib/postgresql/data
+    ports:
+    - "5432:5432"
+    env_file:
+    - postgresql.env
