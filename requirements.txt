@@ -1,7 +1,7 @@
 appdirs==1.4.3
 certifi==2018.4.16
 chardet==3.0.4
-Django==1.11.16
+Django==1.11.18
 django-cors-headers==2.1.0
 django-extensions==1.9.8
 djangorestframework==3.6.3
@@ -18,4 +18,4 @@ pytz==2018.4
 requests==2.20.0
 six==1.11.0
 typing==3.6.2
-urllib3==1.22
+urllib3==1.23
