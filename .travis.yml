@@ -1,9 +1,13 @@
 language: python
 python: 3.6
 
+services:
+  - docker
+
 before_install:
   - sudo apt-get update
   - sudo apt-get install -y binutils libproj-dev gdal-bin
+  - docker-compose up postgres -d
 
 install:
   - pip install -r requirements.txt
