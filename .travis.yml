@@ -11,10 +11,9 @@ before_install:
   - sudo service postgresql stop
   # wait for postgresql to shutdown
   - while sudo lsof -Pi :5432 -sTCP:LISTEN -t; do sleep 1; done
-  - docker-compose up -d postgres
 
 install:
-  - pip install -r requirements.txt
+  - docker-compose up -d postgres
 
 script:
-  - python manage.py test --settings=TooPath3.settings.docker
+  - docker exec -it toopath-api_api_1 python manage.py test
