@@ -16,4 +16,4 @@ install:
   - docker-compose up -d postgres
 
 script:
-  - docker exec -it toopath-api_api_1 python manage.py test
+  - docker-compose exec api python manage.py test
