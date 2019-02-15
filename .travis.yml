@@ -5,8 +5,6 @@ services:
   - docker
 
 before_install:
-  - sudo apt-get update
-  - sudo apt-get install -y binutils libproj-dev gdal-bin
   # Let's stop postgresql
   - sudo service postgresql stop
   # wait for postgresql to shutdown
