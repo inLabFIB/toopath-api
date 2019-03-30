@@ -36,10 +36,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -qq install -y postgresql-${PG_VERSIO
 # Run the rest of the commands as the ``postgres`` user created by the ``postgres`` package when it was ``apt-get installed``
 USER postgres
 
-# Create a PostgreSQL role named ``docker`` with ``docker`` as the password and
-# then create a database `docker` owned by the ``docker`` role.
-# Note: here we use ``&&\`` to run commands one after the other - the ``\``
-#       allows the RUN command to span multiple lines.
+# Create a PostgreSQL role and then create a database
 RUN    /etc/init.d/postgresql start &&\
     psql --command "CREATE USER ${APP_DB_USER} WITH SUPERUSER PASSWORD '${APP_DB_PASS}';" &&\
     psql --command "CREATE DATABASE ${APP_DB_NAME} WITH OWNER=${APP_DB_USER} ENCODING='UTF8' TEMPLATE=template0;" &&\
